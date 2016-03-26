@@ -1,0 +1,30 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+
+apply plugin:'application'
+mainClassName = "tuwien.auto.calimero.TestNetwork"
+
+run {
+    systemProperties System.getProperties()
+    args 'src/main/resources/server-config.xml'
+    standardInput = System.in
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group = 'com.github.calimero'
+version = '2.4-SNAPSHOT'
+
+repositories {        
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile group:group, name: 'calimero-server', version:version
+    compile group:group, name: 'calimero-core', version:version
+    compile group:group, name: 'calimero-device', version:version
+    runtime 'org.slf4j:slf4j-simple:1.7.18'
+}
