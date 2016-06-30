@@ -28,3 +28,13 @@ dependencies {
     compile group:group, name: 'calimero-device', version:version
     runtime 'org.slf4j:slf4j-simple:1.7.18'
 }
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url:"https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: mavenUser, password: mavenPassword)
+            }
+        }
+    }
+}
