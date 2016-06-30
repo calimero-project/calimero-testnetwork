@@ -96,14 +96,14 @@ public class TestNetwork implements Runnable
 					Thread.sleep(UpdateInterval);
 					final boolean createReadWriteTraffic = true;
 					if (createReadWriteTraffic) {
-						try {
-							state = !state;
-							pc.write(new GroupAddress("1/0/1"), state);
-							pc.readBool(new GroupAddress("1/0/1"));
-						}
-						catch (final KNXException e) {
-							System.out.println(e);
-						}
+//						try {
+//							state = !state;
+//							pc.write(new GroupAddress("1/0/1"), state);
+//							pc.readBool(new GroupAddress("1/0/1"));
+//						}
+//						catch (final KNXException e) {
+//							System.out.println(e);
+//						}
 
 						try {
 							intState = ++intState % 101;
