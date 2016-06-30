@@ -33,6 +33,13 @@
 			<knxAddress type="individual">1.1.21</knxAddress>
 			<knxAddress type="individual">1.1.22</knxAddress>
 			<knxAddress type="individual">1.1.23</knxAddress>
+			<knxAddress type="individual">1.1.24</knxAddress>
+			<knxAddress type="individual">1.1.25</knxAddress>
+			<knxAddress type="individual">1.1.26</knxAddress>
+			<knxAddress type="individual">1.1.27</knxAddress>
+			<knxAddress type="individual">1.1.28</knxAddress>
+			<knxAddress type="individual">1.1.29</knxAddress>
+			<knxAddress type="individual">1.1.30</knxAddress>
 		</additionalAddresses>
 	</serviceContainer>
 </knxServer>
