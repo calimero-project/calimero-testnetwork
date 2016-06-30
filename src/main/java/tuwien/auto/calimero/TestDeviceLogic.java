@@ -97,12 +97,12 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		catch (final UnknownHostException e) {}
 		defRoutingMulticast = a;
 
-		byte[] mac = new byte[6];
+		byte[] mac = null;
 		try {
 			mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
 		}
 		catch (final SocketException | UnknownHostException e) {}
-		defMacAddress = mac;
+		defMacAddress = mac != null ? mac : new byte[6];
 	}
 
 	// Values used for service families DIB
