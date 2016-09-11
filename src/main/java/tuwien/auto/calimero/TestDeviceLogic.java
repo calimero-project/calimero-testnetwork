@@ -168,7 +168,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			ios.setProperty(0, PID.SERIAL_NUMBER, 1, 1, serialNo);
 			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 10, 0, 0), true);
 		}
-		catch (final KNXPropertyException e) {
+		catch (KNXPropertyException | RuntimeException e) {
 			e.printStackTrace();
 		}
 
