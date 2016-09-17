@@ -228,7 +228,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	@Override
 	public void updateDatapointValue(final Datapoint ofDp, final DPTXlator update)
 	{
-		System.out.println(device.getAddress() + " -- update " + ofDp.getMainAddress() + " to " + update.getValue());
+//		System.out.println(device.getAddress() + " -- update " + ofDp.getMainAddress() + " to " + update.getValue());
 		state.put(ofDp.getMainAddress(), update.getValue());
 	}
 
