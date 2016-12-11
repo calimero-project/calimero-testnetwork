@@ -46,6 +46,7 @@ import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 import tuwien.auto.calimero.server.Launcher;
 import tuwien.auto.calimero.server.VirtualLink;
+import tuwien.auto.calimero.server.gateway.KnxServerGateway;
 import tuwien.auto.calimero.server.gateway.SubnetConnector;
 
 public class TestNetwork implements Runnable
@@ -78,11 +79,17 @@ public class TestNetwork implements Runnable
 		System.getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "true");
 
 		try {
-			final Launcher svr = new Launcher(configURI);
-			new Thread(svr::run).start();
+			final Launcher launcher = new Launcher(configURI);
+			System.out.println("Start launcher ...");
+			new Thread(launcher).start();
 			Thread.sleep(1000);
 
-			final List<SubnetConnector> connectors = svr.getGateway().getSubnetConnectors();
+			final KnxServerGateway gw = launcher.getGateway();
+			if (gw == null) {
+				System.err.println("Gateway not started - exit");
+				return;
+			}
+			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
 			final VirtualLink link = (VirtualLink) connectors.get(0).getSubnetLink();
 
 			final KnxDevice d4 = createDevice("1.1.4", link);
@@ -117,7 +124,7 @@ public class TestNetwork implements Runnable
 				}
 			}
 		}
-		catch (final KNXException | InterruptedException e) {
+		catch (KNXException | InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
