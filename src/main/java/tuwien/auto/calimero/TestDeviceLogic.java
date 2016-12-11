@@ -299,10 +299,13 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	{
 		super.management(svcType, asdu, dst, respondTo, tl);
 		if (svcType == NetworkParameterWrite && LinkProcedure.isEnterConfigMode(asdu)) {
+			// we don't have access to the device management client, create our own
 			final ManagementClientImpl mgmt = new ManagementClientImpl(device.getDeviceLink(), tl) {
 				@Override
 				public KNXNetworkLink detach()
 				{
+					// we created the mgmt client with an existing transport layer instance, therefore, we should not
+					// detach it here (the link procedure does not use this method, but nevertheless)
 					return null;
 				}
 			};
@@ -311,8 +314,10 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final int CC_Dimming_Ctrl = 5;
 			groupObjects.put(CC_Switch_OnOff, new GroupAddress(7, 3, 10));
 			groupObjects.put(CC_Dimming_Ctrl, new GroupAddress(7, 3, 11));
-			new Thread(LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef, groupObjects),
-					device.getAddress() + " Link Procedure Thread").start();
+			final LinkProcedure lp = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
+					groupObjects);
+			lp.setLinkFunction(this::onLinkResponse);
+			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
 		}
 		else if (svcType == NetworkParameterRead) {
 			final int receivedIot = (asdu[0] & 0xff) << 0xff | (asdu[1] & 0xff);
@@ -357,6 +362,12 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			}
 		}
 		return null;
+	}
+
+	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
+	{
+		System.out.println("link response: flags " + flags + " and group objects " + groupObjects);
+		return 0;
 	}
 
 	// precondition: we have an IOS instance
