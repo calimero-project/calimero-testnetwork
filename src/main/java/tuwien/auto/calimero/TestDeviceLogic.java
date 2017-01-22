@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2016 B. Malinowsky
+    Copyright (c) 2010, 2017 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -75,7 +75,6 @@ import tuwien.auto.calimero.mgmt.ManagementClientImpl;
 import tuwien.auto.calimero.mgmt.PropertyAccess;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.mgmt.TransportLayer;
-import tuwien.auto.calimero.server.knxnetip.RoutingEndpoint;
 
 /**
  * Test device logic for KNX devices in our test network.
@@ -208,7 +207,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		}
 
 		try {
-			initKNXnetIpParameterObject(ios, 1, null);
+			initKNXnetIpParameterObject(ios, 1);
 		}
 		catch (final KNXPropertyException e) {
 			e.printStackTrace();
@@ -371,8 +370,8 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	// precondition: we have an IOS instance
-	private void initKNXnetIpParameterObject(final InterfaceObjectServer ios, final int objectInstance,
-		final RoutingEndpoint endpoint) throws KNXPropertyException
+	private void initKNXnetIpParameterObject(final InterfaceObjectServer ios, final int objectInstance)
+		throws KNXPropertyException
 	{
 		final int knxObject = 11;
 		// reset transmit counter to 0
@@ -396,10 +395,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		ios.setProperty(knxObject, objectInstance, PID.MAC_ADDRESS, 1, 1, defMacAddress);
 
 		// routing stuff
-		if (endpoint != null)
-			;//	setRoutingConfiguration(endpoint);
-		else
-			resetRoutingConfiguration(ios);
+		resetRoutingConfiguration(ios);
 
 		// ip and setup multicast
 		byte[] ip = new byte[4];
