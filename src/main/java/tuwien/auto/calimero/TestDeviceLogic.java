@@ -55,7 +55,7 @@ import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
-import tuwien.auto.calimero.device.ios.KNXPropertyException;
+import tuwien.auto.calimero.device.ios.KnxPropertyException;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -167,7 +167,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			ios.setProperty(0, PID.SERIAL_NUMBER, 1, 1, serialNo);
 			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 10, 0, 0), true);
 		}
-		catch (KNXPropertyException | RuntimeException e) {
+		catch (final RuntimeException e) {
 			e.printStackTrace();
 		}
 
@@ -188,7 +188,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		try {
 			ios.setProperty(0, 1, PID.IO_LIST, 1, iosize, ioList);
 		}
-		catch (final KNXPropertyException e1) {
+		catch (final KnxPropertyException e1) {
 			e1.printStackTrace();
 		}
 
@@ -202,14 +202,14 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			idx = 4;
 			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { 4 });
 		}
-		catch (final KNXPropertyException e) {
+		catch (final KnxPropertyException e) {
 			e.printStackTrace();
 		}
 
 		try {
 			initKNXnetIpParameterObject(ios, 1);
 		}
-		catch (final KNXPropertyException e) {
+		catch (final KnxPropertyException e) {
 			e.printStackTrace();
 		}
 	}
@@ -371,7 +371,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	// precondition: we have an IOS instance
 	private void initKNXnetIpParameterObject(final InterfaceObjectServer ios, final int objectInstance)
-		throws KNXPropertyException
+		throws KnxPropertyException
 	{
 		final int knxObject = 11;
 		// reset transmit counter to 0
@@ -453,7 +453,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			ios.setProperty(InterfaceObject.KNXNETIP_PARAMETER_OBJECT, 1, PID.ROUTING_MULTICAST_ADDRESS, 1, 1,
 					new byte[4]);
 		}
-		catch (final KNXPropertyException e) {}
+		catch (final KnxPropertyException e) {}
 	}
 
 	private void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
@@ -464,7 +464,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, new byte[] { value });
 			ios.setProperty(idx, PropertyAccess.PID.ERROR_CODE, 1, 1, new byte[] { 8 });
 		}
-		catch (final KNXPropertyException e) {
+		catch (final KnxPropertyException e) {
 			e.printStackTrace();
 		}
 	}
