@@ -20,6 +20,7 @@ version = '2.4-SNAPSHOT'
 repositories {        
     mavenLocal()
     mavenCentral()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
 compileJava.options*.compilerArgs = [
@@ -39,7 +40,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             repository(url:"https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: mavenUser, password: mavenPassword)
+                authentication(userName: findProperty('mavenUser'), password: findProperty('mavenPassword'))
             }
         }
     }
