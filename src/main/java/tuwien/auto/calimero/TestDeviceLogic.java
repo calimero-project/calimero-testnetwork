@@ -105,7 +105,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		try {
 			mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
 		}
-		catch (final SocketException | UnknownHostException e) {}
+		catch (SocketException | UnknownHostException | NullPointerException ignore) {}
 		defMacAddress = mac != null ? mac : new byte[6];
 	}
 
