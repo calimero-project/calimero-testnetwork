@@ -141,15 +141,15 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			state.put(dp.getMainAddress(), s);
 		}
 		state.put(new GroupAddress("1/0/5"), "Hello KNX!");
-
-		for (int i = 0; i < 5000; i++)
-			writeMemory(i, new byte[] { (byte) i });
 	}
 
 	@Override
 	public void setDevice(final KnxDevice device)
 	{
 		super.setDevice(device);
+
+		for (int i = 0; i < 1000; i++)
+			writeMemory(i, new byte[] { (byte) i });
 
 		if (device.getAddress().toString().equals("1.1.4"))
 			setProgrammingMode(true);
@@ -160,17 +160,17 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		try {
 			final InterfaceObjectServer ios = device.getInterfaceObjectServer();
 			// set TP1 medium type
-			ios.setDescription(new Description(0, 0, PID.MEDIUM_TYPE, 0, 0, false, 0, 10, 0, 0), true);
+			ios.setDescription(new Description(0, 0, PID.MEDIUM_TYPE, 0, 0, false, 0, 1, 3, 0), true);
 			ios.setProperty(0, PID.MEDIUM_TYPE, 1, 1, new byte[] { 0x1 });
 
 			// set device control property, used for checking verify mode
-			ios.setDescription(new Description(0, 0, PID.DEVICE_CONTROL, 0, 0, true, 0, 10, 0, 0), true);
+			ios.setDescription(new Description(0, 0, PID.DEVICE_CONTROL, 0, 0, true, 0, 1, 3, 3), true);
 			ios.setProperty(0, PID.DEVICE_CONTROL, 1, 1, new byte[] { 0x0 });
 
 			final int last = device.getAddress().getDevice() + 1;
 			final byte[] serialNo = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last };
 			ios.setProperty(0, PID.SERIAL_NUMBER, 1, 1, serialNo);
-			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 10, 0, 0), true);
+			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 1, 3, 0), true);
 		}
 		catch (final RuntimeException e) {
 			e.printStackTrace();
@@ -243,45 +243,23 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult readDescriptor(final int type)
-	{
-		return new ServiceResult(new byte[] { 5 << 4 | 7, (byte) (0 << 4 | 5) });
-	}
-
-	@Override
 	public ServiceResult readADC(final int channel, final int consecutiveReads)
 	{
 		return new ServiceResult(new byte[] { (byte) channel, (byte) consecutiveReads, 0x1, 0x0 });
 	}
 
 	@Override
-	public ServiceResult keyWrite(final int accessLevel, final byte[] key)
+	public ServiceResult authorize(final Destination remote, final byte[] key)
 	{
-		return new ServiceResult(new byte[] { (byte) accessLevel });
-	}
-
-	@Override
-	public ServiceResult authorize(final byte[] key)
-	{
-		// possible access levels [max .. min]: [0 .. 3] or [0 .. 15]
-		// clients with invalid auth always get minimum level 3/15
-		final int levelInvalidAuth = 15;
-
-		// choose the maximum access level an unauthorized client gets
-		final int maxLevelNoAuth = 14;
-		// the default auth key used for levels providing unauthorized access
-		final byte[] defaultKey = new byte[] { (byte) 0xff, (byte) 0xff, (byte) 0xff, (byte) 0xff };
-
 		final byte[] validKey = new byte[] { 0x10, 0x20, 0x30, 0x40 };
 		final int levelValid = 2;
 
-		int currentLevel = levelInvalidAuth;
-		if (Arrays.equals(key, validKey))
-			currentLevel = levelValid;
-		else if (Arrays.equals(key, defaultKey))
-			currentLevel = maxLevelNoAuth;
-
-		return new ServiceResult(new byte[] { (byte) currentLevel });
+		if (Arrays.equals(key, validKey)) {
+			final int currentLevel = levelValid;
+			return new ServiceResult((byte) currentLevel);
+		}
+		else
+			return super.authorize(remote, key);
 	}
 
 	@Override
