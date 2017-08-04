@@ -47,6 +47,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.StateDP;
@@ -81,6 +84,8 @@ import tuwien.auto.calimero.mgmt.TransportLayer;
  */
 class TestDeviceLogic extends KnxDeviceServiceLogic
 {
+	private static final Logger logger = LoggerFactory.getLogger(TestDeviceLogic.class);
+
 	// PID.PROJECT_INSTALLATION_ID
 	private static final int defProjectInstallationId = 0;
 	// PID.ROUTING_MULTICAST_ADDRESS
@@ -328,7 +333,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			if (receivedIot != 0 || receivedPid != 59) {
 				// if service was sent as broadcast, invalid requests shall be ignored
 				if (broadcast) {
-					System.out.println("invalid A_NetworkParameter.req in broadcast mode, ignore");
+					logger.warn("invalid A_NetworkParameter.req in broadcast mode, ignore");
 					return null;
 				}
 				response = new byte[] { svcRes[0], svcRes[1], asdu[0], asdu[1], (byte) 0xff };
@@ -348,11 +353,11 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 				response[6] = 0xa;
 			}
 			try {
-				System.out.println("A_NetworkParameter.response " + device.getAddress() + "->" + respondTo.getAddress()
+				logger.info("A_NetworkParameter.response " + device.getAddress() + "->" + respondTo.getAddress()
 						+ ": " + DataUnitBuilder.toHex(response, ""));
 				final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
 				final int wait = broadcast ? new Random().nextInt(10 * tmedium) : 0;
-				System.out.println("add random wait time of " + wait + " ms before response");
+				logger.debug("add random wait time of " + wait + " ms before response");
 				Thread.sleep(wait);
 				tl.sendData(respondTo.getAddress(), Priority.SYSTEM, response);
 			}
@@ -365,7 +370,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
 	{
-		System.out.println("link response: flags " + flags + " and group objects " + groupObjects);
+		logger.info("link response: flags " + flags + " and group objects " + groupObjects);
 		return 0;
 	}
 
