@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2017 B. Malinowsky
+    Copyright (c) 2010, 2018 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.StateDP;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
+import tuwien.auto.calimero.device.LinkProcedure;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
@@ -73,7 +74,6 @@ import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.Description;
 import tuwien.auto.calimero.mgmt.Destination;
-import tuwien.auto.calimero.mgmt.LinkProcedure;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
 import tuwien.auto.calimero.mgmt.PropertyAccess;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
