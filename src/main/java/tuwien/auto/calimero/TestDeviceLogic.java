@@ -302,7 +302,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
 		}
 		else if (svcType == NetworkParameterRead) {
-			final int receivedIot = (asdu[0] & 0xff) << 0xff | (asdu[1] & 0xff);
+			final int receivedIot = (asdu[0] & 0xff) << 8 | (asdu[1] & 0xff);
 			final int receivedPid = asdu[2] & 0xff;
 			final byte[] response;
 			final byte[] svcRes = bytesFromWord(NetworkParameterRes);
