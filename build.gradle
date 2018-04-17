@@ -33,7 +33,7 @@ dependencies {
     compile group:group, name: 'calimero-server', version:version
     compile group:group, name: 'calimero-core', version:version
     compile group:group, name: 'calimero-device', version:version
-    runtime 'org.slf4j:slf4j-simple:1.8.0-alpha2'
+    runtime 'org.slf4j:slf4j-simple:1.8.0-beta2'
 }
 
 uploadArchives {
