@@ -40,6 +40,7 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -176,7 +177,6 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			e.printStackTrace();
 		}
 
-		// TODO init stuff for KNX IP devices
 		final InterfaceObjectServer ios = device.getInterfaceObjectServer();
 		ios.addInterfaceObject(InterfaceObject.ADDRESSTABLE_OBJECT);
 		ios.addInterfaceObject(InterfaceObject.ASSOCIATIONTABLE_OBJECT);
@@ -232,7 +232,6 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	@Override
 	public void updateDatapointValue(final Datapoint ofDp, final DPTXlator update)
 	{
-//		System.out.println(device.getAddress() + " -- update " + ofDp.getMainAddress() + " to " + update.getValue());
 		state.put(ofDp.getMainAddress(), update.getValue());
 	}
 
@@ -367,7 +366,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		//
 		// friendly name property entry is an array of 30 characters
 		final byte[] data = new byte[30];
-		System.arraycopy(friendlyName.getBytes(), 0, data, 0, friendlyName.length());
+		System.arraycopy(friendlyName.getBytes(Charset.forName("ISO-8859-1")), 0, data, 0, friendlyName.length());
 		ios.setProperty(knxObject, objectInstance, PID.FRIENDLY_NAME, 1, data.length, data);
 		ios.setProperty(knxObject, objectInstance, PID.PROJECT_INSTALLATION_ID, 1, 1,
 				bytesFromWord(defProjectInstallationId));

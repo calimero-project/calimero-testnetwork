@@ -80,13 +80,13 @@ public class TestNetwork implements Runnable
 
 		try {
 			final Launcher launcher = new Launcher(configURI);
-			System.out.println("Start launcher ...");
 			new Thread(launcher).start();
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
+				launcher.quit();
 				return;
 			}
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
@@ -135,8 +135,8 @@ public class TestNetwork implements Runnable
 		final TestDeviceLogic logic = new TestDeviceLogic();
 		final KNXNetworkLink devLink = downLink.createDeviceLink(ia);
 		final KnxDevice dev = new BaseKnxDevice("Device " + ia.toString(), logic, devLink);
-		// XXX we have to init device stuff in setDevice, because before the device is null
-		logic.setDevice(dev);
+		// we have to init device stuff in setDevice, because before the device is null
+//		logic.setDevice(dev);
 		return dev;
 	}
 }
