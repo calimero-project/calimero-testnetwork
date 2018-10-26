@@ -19,6 +19,7 @@ version = '2.4-rc1'
 
 repositories {        
     mavenLocal()
+    jcenter()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
