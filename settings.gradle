@@ -1,1 +1,9 @@
 rootProject.name = 'calimero-testnetwork'
+
+def safeIncludeBuild(String dir) {
+	if (file(dir).exists()) includeBuild dir
+}
+
+safeIncludeBuild '../calimero-core'
+safeIncludeBuild '../calimero-device'
+safeIncludeBuild '../calimero-server'
