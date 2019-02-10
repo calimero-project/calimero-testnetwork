@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -80,13 +80,15 @@ public class TestNetwork implements Runnable
 
 		try {
 			final Launcher launcher = new Launcher(configURI);
-			new Thread(launcher).start();
+			final Thread t = new Thread(launcher);
+			t.start();
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
 				launcher.quit();
+				t.interrupt();
 				return;
 			}
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
@@ -96,7 +98,7 @@ public class TestNetwork implements Runnable
 			/*final KnxDevice d5 =*/ createDevice("1.1.5", link);
 			System.out.println("Test network is up and running");
 
-			boolean state = true;
+			final boolean state = true;
 			int intState = 13;
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
@@ -134,9 +136,7 @@ public class TestNetwork implements Runnable
 		final IndividualAddress ia = new IndividualAddress(address);
 		final TestDeviceLogic logic = new TestDeviceLogic();
 		final KNXNetworkLink devLink = downLink.createDeviceLink(ia);
-		final KnxDevice dev = new BaseKnxDevice("Device " + ia.toString(), logic, devLink);
-		// we have to init device stuff in setDevice, because before the device is null
-//		logic.setDevice(dev);
+		final KnxDevice dev = new BaseKnxDevice("Device", logic, devLink);
 		return dev;
 	}
 }

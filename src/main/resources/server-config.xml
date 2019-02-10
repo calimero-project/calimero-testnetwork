@@ -13,6 +13,14 @@
 			<knxAddress type="group">1/0/5</knxAddress>
 			<knxAddress type="group">1/0/6</knxAddress>
 			<knxAddress type="group">1/07</knxAddress> <!-- 1/0/7 -->
+			<knxAddress type="group">1/0/200</knxAddress>
+			<knxAddress type="group">1/0/201</knxAddress>
+			<knxAddress type="group">1/0/202</knxAddress>
+			<knxAddress type="group">1/0/203</knxAddress>
+			<knxAddress type="group">1/0/204</knxAddress>
+			<knxAddress type="group">1/0/205</knxAddress>
+			<knxAddress type="group">1/0/206</knxAddress>
+			<knxAddress type="group">1/0/207</knxAddress>
 			<knxAddress type="group">0x080b</knxAddress> <!-- 1/0/11 -->
 			<knxAddress type="group">1/0/111</knxAddress>
 			<knxAddress type="group">0/0/0</knxAddress>

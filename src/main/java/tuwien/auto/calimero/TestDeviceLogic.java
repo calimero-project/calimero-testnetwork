@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2018 B. Malinowsky
+    Copyright (c) 2010, 2019 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -61,6 +61,7 @@ import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
 import tuwien.auto.calimero.device.ios.KnxPropertyException;
+import tuwien.auto.calimero.dptxlator.DPT;
 import tuwien.auto.calimero.dptxlator.DPTXlator;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
@@ -69,6 +70,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
 import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
 import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
+import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.knxnetip.Discoverer;
 import tuwien.auto.calimero.link.KNXLinkClosedException;
@@ -142,6 +144,17 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			state.put(dp.getMainAddress(), s);
 		}
 		state.put(new GroupAddress("1/0/5"), "Hello KNX!");
+
+		addDatapoint("1/0/200", DPTXlator2ByteUnsigned.DPT_ABSOLUTE_COLOR_TEMPERATURE);
+		addDatapoint("1/0/205", DptXlator16BitSet.DptRhccStatus);
+		addDatapoint("1/0/206", DptXlator16BitSet.DptMedia);
+	}
+
+	private void addDatapoint(String address, DPT dpt) throws KNXException {
+		StateDP dp = new StateDP(new GroupAddress(address), dpt.getDescription(), 0, dpt.getID());
+		getDatapointModel().add(dp);
+		final String s = TranslatorTypes.createTranslator(0, dp.getDPT()).getValue();
+		state.put(dp.getMainAddress(), s);
 	}
 
 	@Override
@@ -203,9 +216,9 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		setProgramData(ios, idx, (byte) 5);
 		idx = 3;
 		try {
-			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { 1 });
+			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, (byte) 1);
 			idx = 4;
-			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { 4 });
+			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, (byte) 4);
 		}
 		catch (final KnxPropertyException e) {
 			e.printStackTrace();
