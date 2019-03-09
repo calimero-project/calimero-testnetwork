@@ -36,6 +36,11 @@
 
 package tuwien.auto.calimero;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.List;
 
 import tuwien.auto.calimero.device.BaseKnxDevice;
@@ -77,6 +82,22 @@ public class TestNetwork implements Runnable
 	{
 		System.getProperties().setProperty("org.slf4j.simpleLogger.logFile", "System.out");
 		System.getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "true");
+
+		final String netif = System.getProperty("calimero.testnetwork.netif");
+		if (netif != null) {
+			// using RandomAccessFile because Files.readAllBytes(path) doesn't resolve 'server-config.xml' to cwd
+			try (RandomAccessFile file = new RandomAccessFile(configURI, "r")) {
+				final byte[] buf = new byte[(int) file.length()];
+				file.readFully(buf);
+				final String s = new String(buf, UTF_8).replace("listenNetIf=\"any\"", "listenNetIf=\"" + netif + "\"");
+				try (FileOutputStream fos = new FileOutputStream(configURI, false)) {
+					fos.write(s.getBytes(UTF_8));
+				}
+			}
+			catch (final IOException e) {
+				e.printStackTrace();
+			}
+		}
 
 		try {
 			final Launcher launcher = new Launcher(configURI);
