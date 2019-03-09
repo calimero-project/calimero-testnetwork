@@ -46,6 +46,9 @@ import java.util.List;
 import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.link.KNXNetworkLink;
+import tuwien.auto.calimero.mgmt.ManagementClient;
+import tuwien.auto.calimero.mgmt.ManagementClientImpl;
+import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
 import tuwien.auto.calimero.process.ProcessCommunicationBase;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
@@ -119,22 +122,21 @@ public class TestNetwork implements Runnable
 			/*final KnxDevice d5 =*/ createDevice("1.1.5", link);
 			System.out.println("Test network is up and running");
 
-			final boolean state = true;
+			boolean state = true;
 			int intState = 13;
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
 					Thread.sleep(UpdateInterval);
 					final boolean createReadWriteTraffic = true;
 					if (createReadWriteTraffic) {
-//						try {
-//							state = !state;
-//							pc.write(new GroupAddress("1/0/1"), state);
-//							pc.readBool(new GroupAddress("1/0/1"));
-//						}
-//						catch (final KNXException e) {
-//							System.out.println(e);
-//						}
-
+						try {
+							state = !state;
+							pc.write(new GroupAddress("1/0/1"), state);
+							pc.readBool(new GroupAddress("1/0/1"));
+						}
+						catch (final KNXException e) {
+							System.out.println(e);
+						}
 						try {
 							intState = ++intState % 101;
 							pc.write(new GroupAddress("1/0/3"), intState, ProcessCommunicationBase.SCALING);
@@ -144,6 +146,10 @@ public class TestNetwork implements Runnable
 							System.out.println(e);
 						}
 					}
+					final boolean createSystemBroadcasts = true;
+					if (createSystemBroadcasts) {
+						sendSystemBroadcasts((BaseKnxDevice) d4);
+					}
 				}
 			}
 		}
@@ -152,12 +158,64 @@ public class TestNetwork implements Runnable
 		}
 	}
 
+	private static final int A_FunctionPropertyCommand = 0b1011000111;
+	private static final int pidIpSbcControl = 120;
+
+	private void sendSystemBroadcasts(final BaseKnxDevice device) throws KNXException, InterruptedException {
+		try (ManagementClient mgmt = new ManagementClientImpl(device.getDeviceLink(), device.transportLayer()) {
+			@Override
+			public KNXNetworkLink detach() {
+				// we create the mgmt client with an existing transport layer instance, therefore, we should not
+				// detach it here
+				return null;
+			}
+		}) {
+			// enable server system broadcast mode
+			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) 3, (byte) pidIpSbcControl,
+					(byte) 0, (byte) 0, (byte) 1);
+			device.transportLayer().sendData(new IndividualAddress(1, 1, 0), Priority.LOW, tsdu);
+
+//			final byte[] sno = { 1, 2, 3, 4, 5, 6 };
+//			final byte[] domain = { (byte) 224, 0, 23, 23 };
+//			mgmt.writeDomainAddress(sno, domain);
+			// this should be forwarded normally (not as sysbcast)
+//			mgmt.writeDomainAddress(sno, new byte[] { 1, 2 });
+
+			mgmt.setResponseTimeout(1);
+			final byte operand = 1;
+			try {
+				mgmt.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, operand);
+			}
+			catch (final KNXTimeoutException ignore) {}
+
+			// the following ones should be normally forwarded (not as sysbcast) from subnet -> IP
+			try {
+				mgmt.readSystemNetworkParameter(1, PID.SERIAL_NUMBER, operand);
+			}
+			catch (final KNXTimeoutException ignore) {}
+			try {
+				mgmt.readSystemNetworkParameter(0, 40, operand);
+			}
+			catch (final KNXTimeoutException ignore) {}
+			try {
+				mgmt.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, (byte) 0);
+			}
+			catch (final KNXTimeoutException ignore) {}
+		}
+		finally {
+			// disable server system broadcast mode
+			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) 3, (byte) pidIpSbcControl,
+					(byte) 0, (byte) 0, (byte) 0);
+			device.transportLayer().sendData(new IndividualAddress(1, 1, 0), Priority.LOW, tsdu);
+		}
+	}
+
 	private static KnxDevice createDevice(final String address, final VirtualLink downLink) throws KNXException
 	{
 		final IndividualAddress ia = new IndividualAddress(address);
 		final TestDeviceLogic logic = new TestDeviceLogic();
 		final KNXNetworkLink devLink = downLink.createDeviceLink(ia);
-		final KnxDevice dev = new BaseKnxDevice("Device", logic, devLink);
+		final KnxDevice dev = new BaseKnxDevice("Device-" + ia.getDevice(), logic, devLink);
 		return dev;
 	}
 }
