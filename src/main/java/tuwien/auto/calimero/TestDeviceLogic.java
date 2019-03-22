@@ -54,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import tuwien.auto.calimero.datapoint.Datapoint;
 import tuwien.auto.calimero.datapoint.DatapointMap;
 import tuwien.auto.calimero.datapoint.StateDP;
+import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.LinkProcedure;
@@ -73,7 +74,6 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.knxnetip.Discoverer;
-import tuwien.auto.calimero.link.KNXLinkClosedException;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.Description;
 import tuwien.auto.calimero.mgmt.Destination;
@@ -255,6 +255,52 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
+	public ServiceResult readParameter(int objectType, int pid, byte[] info) {
+		if (objectType != 0 || pid != 59)
+			return super.readParameter(objectType, pid, info);
+
+		final boolean broadcast = false; // dst.equals(new GroupAddress(0, 0, 0)); // XXX
+		final byte[] response = new byte[1];
+		response[0] = 0xa;
+		final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
+		final int wait = broadcast ? new Random().nextInt(10 * tmedium) : 0;
+		logger.debug("add random wait time of " + wait + " ms before response");
+		try {
+			Thread.sleep(wait);
+		}
+		catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return new ServiceResult(response);
+	}
+
+	@Override
+	public void writeParameter(int objectType, int pid, byte[] info) {
+		if (LinkProcedure.isEnterConfigMode(objectType, pid, info)) {
+			final ManagementClientImpl mgmt = new ManagementClientImpl(device.getDeviceLink(),
+					((BaseKnxDevice) device).transportLayer()) {
+				@Override
+				public KNXNetworkLink detach() {
+					// we created the mgmt client with an existing transport layer instance, therefore, we should not
+					// detach it here (the link procedure does not use this method, but nevertheless)
+					return null;
+				}
+			};
+			final Map<Integer, GroupAddress> groupObjects = new HashMap<>();
+			final int CC_Switch_OnOff = 1;
+			final int CC_Dimming_Ctrl = 5;
+			groupObjects.put(CC_Switch_OnOff, new GroupAddress(7, 3, 10));
+			groupObjects.put(CC_Dimming_Ctrl, new GroupAddress(7, 3, 11));
+
+			Destination respondTo = mgmt.createDestination(new IndividualAddress(1), false);
+			final LinkProcedure lp = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
+					groupObjects);
+			lp.setLinkFunction(this::onLinkResponse);
+			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
+		}
+	}
+
+	@Override
 	public ServiceResult readADC(final int channel, final int consecutiveReads)
 	{
 		return new ServiceResult(new byte[] { (byte) channel, (byte) consecutiveReads, 0x1, 0x0 });
@@ -283,79 +329,16 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		return null;
 	}
 
-	private static final int NetworkParameterRead = 0b1111011010;
-	private static final int NetworkParameterWrite = 0b1111100100;
 	private static final int NetworkParameterRes = 0b1111011011;
+	private static final int SystemNetworkParamResponse = 0b0111001001;
 
 	@Override
 	public ServiceResult management(final int svcType, final byte[] asdu, final KNXAddress dst,
 		final Destination respondTo, final TransportLayer tl)
 	{
-		super.management(svcType, asdu, dst, respondTo, tl);
-		if (svcType == NetworkParameterWrite && LinkProcedure.isEnterConfigMode(asdu)) {
-			// we don't have access to the device management client, create our own
-			final ManagementClientImpl mgmt = new ManagementClientImpl(device.getDeviceLink(), tl) {
-				@Override
-				public KNXNetworkLink detach()
-				{
-					// we created the mgmt client with an existing transport layer instance, therefore, we should not
-					// detach it here (the link procedure does not use this method, but nevertheless)
-					return null;
-				}
-			};
-			final Map<Integer, GroupAddress> groupObjects = new HashMap<>();
-			final int CC_Switch_OnOff = 1;
-			final int CC_Dimming_Ctrl = 5;
-			groupObjects.put(CC_Switch_OnOff, new GroupAddress(7, 3, 10));
-			groupObjects.put(CC_Dimming_Ctrl, new GroupAddress(7, 3, 11));
-			final LinkProcedure lp = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
-					groupObjects);
-			lp.setLinkFunction(this::onLinkResponse);
-			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
-		}
-		else if (svcType == NetworkParameterRead) {
-			final int receivedIot = (asdu[0] & 0xff) << 8 | (asdu[1] & 0xff);
-			final int receivedPid = asdu[2] & 0xff;
-			final byte[] response;
-			final byte[] svcRes = bytesFromWord(NetworkParameterRes);
-			final boolean broadcast = dst.equals(new GroupAddress(0, 0, 0));
-
-			if (receivedIot != 0 || receivedPid != 59) {
-				// if service was sent as broadcast, invalid requests shall be ignored
-				if (broadcast) {
-					logger.warn("invalid A_NetworkParameter.req in broadcast mode, ignore");
-					return null;
-				}
-				response = new byte[] { svcRes[0], svcRes[1], asdu[0], asdu[1], (byte) 0xff };
-				if (receivedIot != 0) {
-					response[2] = (byte) 0xff;
-					response[3] = (byte) 0xff;
-				}
-			}
-			else {
-				response = new byte[2 + asdu.length + 2];
-				response[0] = svcRes[0];
-				response[1] = svcRes[1];
-				response[2] = asdu[0];
-				response[3] = asdu[1];
-				response[4] = asdu[2];
-				response[5] = 1;
-				response[6] = 0xa;
-			}
-			try {
-				logger.info("A_NetworkParameter.response " + device.getAddress() + "->" + respondTo.getAddress()
-						+ ": " + DataUnitBuilder.toHex(response, ""));
-				final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
-				final int wait = broadcast ? new Random().nextInt(10 * tmedium) : 0;
-				logger.debug("add random wait time of " + wait + " ms before response");
-				Thread.sleep(wait);
-				tl.sendData(respondTo.getAddress(), Priority.SYSTEM, response);
-			}
-			catch (KNXLinkClosedException | KNXTimeoutException | InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-		return null;
+		if (svcType == NetworkParameterRes || svcType == SystemNetworkParamResponse)
+			return null;
+		return super.management(svcType, asdu, dst, respondTo, tl);
 	}
 
 	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
