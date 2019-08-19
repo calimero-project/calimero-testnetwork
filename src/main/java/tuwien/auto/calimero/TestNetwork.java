@@ -38,8 +38,10 @@ package tuwien.auto.calimero;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.util.List;
 
@@ -126,7 +128,14 @@ public class TestNetwork implements Runnable
 			int intState = 13;
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
-					Thread.sleep(UpdateInterval);
+					final String s = readStdio(UpdateInterval);
+					if ("exit".equals(s)) {
+						launcher.quit();
+						break;
+					}
+					else if ("stat".equals(s))
+						System.out.println(gw);
+
 					final boolean createReadWriteTraffic = true;
 					if (createReadWriteTraffic) {
 						try {
@@ -153,9 +162,27 @@ public class TestNetwork implements Runnable
 				}
 			}
 		}
-		catch (KNXException | InterruptedException e) {
+		catch (KNXException | InterruptedException | IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String readStdio(final int timeout) throws InterruptedException, IOException {
+		final long now = System.nanoTime();
+		final long end = now + timeout * 1_000_000L;
+
+		final var reader = new BufferedReader(new InputStreamReader(System.in));
+		String line = "";
+		do {
+			while (!reader.ready()) {
+				if (System.nanoTime() > end)
+					return "";
+				Thread.sleep(200);
+			}
+			line = reader.readLine();
+		}
+		while ("".equals(line));
+		return line;
 	}
 
 	private static final int A_FunctionPropertyCommand = 0b1011000111;
