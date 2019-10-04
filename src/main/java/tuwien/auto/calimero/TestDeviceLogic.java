@@ -75,7 +75,6 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.knxnetip.Discoverer;
-import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.Description;
 import tuwien.auto.calimero.mgmt.Destination;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
@@ -279,14 +278,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	public void writeParameter(int objectType, int pid, byte[] info) {
 		if (LinkProcedure.isEnterConfigMode(objectType, pid, info)) {
 			final ManagementClientImpl mgmt = new ManagementClientImpl(device.getDeviceLink(),
-					((BaseKnxDevice) device).transportLayer()) {
-				@Override
-				public KNXNetworkLink detach() {
-					// we created the mgmt client with an existing transport layer instance, therefore, we should not
-					// detach it here (the link procedure does not use this method, but nevertheless)
-					return null;
-				}
-			};
+					((BaseKnxDevice) device).transportLayer()) {};
 			final Map<Integer, GroupAddress> groupObjects = new HashMap<>();
 			final int CC_Switch_OnOff = 1;
 			final int CC_Dimming_Ctrl = 5;

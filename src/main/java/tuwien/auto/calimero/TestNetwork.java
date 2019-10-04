@@ -189,14 +189,7 @@ public class TestNetwork implements Runnable
 	private static final int pidIpSbcControl = 120;
 
 	private void sendSystemBroadcasts(final BaseKnxDevice device) throws KNXException, InterruptedException {
-		try (ManagementClient mgmt = new ManagementClientImpl(device.getDeviceLink(), device.transportLayer()) {
-			@Override
-			public KNXNetworkLink detach() {
-				// we create the mgmt client with an existing transport layer instance, therefore, we should not
-				// detach it here
-				return null;
-			}
-		}) {
+		try (ManagementClient mgmt = new ManagementClientImpl(device.getDeviceLink(), device.transportLayer()) {}) {
 			// enable server system broadcast mode
 			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) 3, (byte) pidIpSbcControl,
 					(byte) 0, (byte) 0, (byte) 1);
