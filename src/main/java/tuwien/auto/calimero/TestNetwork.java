@@ -104,8 +104,7 @@ public class TestNetwork implements Runnable
 			}
 		}
 
-		try {
-			final Launcher launcher = new Launcher(configURI);
+		try (var launcher = new Launcher(configURI)) {
 			final Thread t = new Thread(launcher);
 			t.start();
 			Thread.sleep(1000);
@@ -113,8 +112,6 @@ public class TestNetwork implements Runnable
 			final KnxServerGateway gw = launcher.getGateway();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
-				launcher.quit();
-				t.interrupt();
 				return;
 			}
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
@@ -129,11 +126,9 @@ public class TestNetwork implements Runnable
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
 					final String s = readStdio(UpdateInterval);
-					if ("exit".equals(s)) {
-						launcher.quit();
+					if ("exit".equals(s))
 						break;
-					}
-					else if ("stat".equals(s))
+					if ("stat".equals(s))
 						System.out.println(gw);
 
 					final boolean createReadWriteTraffic = true;
