@@ -14,6 +14,9 @@ run {
 sourceCompatibility = 11
 targetCompatibility = 11
 
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
 group = 'com.github.calimero'
 version = '2.5-SNAPSHOT'
 
