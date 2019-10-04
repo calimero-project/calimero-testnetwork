@@ -58,6 +58,7 @@ import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.LinkProcedure;
+import tuwien.auto.calimero.device.ManagementService.EraseCode;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
@@ -321,7 +322,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult restart(final boolean masterReset, final int eraseCode, final int channel)
+	public ServiceResult restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
 	{
 		super.restart(masterReset, eraseCode, channel);
 		if (device.getAddress().equals(new IndividualAddress(1, 1, 4)))
