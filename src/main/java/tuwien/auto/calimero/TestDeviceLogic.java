@@ -256,6 +256,14 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	@Override
 	public ServiceResult readParameter(int objectType, int pid, byte[] info) {
+		if (objectType == InterfaceObject.ADDRESSTABLE_OBJECT && pid == PID.TABLE && info.length == 3) {
+			int range = info[0] & 0xff;
+			int startAddress = (info[1] & 0xff) << 8 | info[2] & 0xff;
+			for (int i = 0; i < range; i++)
+				if (state.containsKey(new GroupAddress(startAddress + i)))
+					return new ServiceResult(info);
+			return null;
+		}
 		if (objectType != 0 || pid != 59)
 			return super.readParameter(objectType, pid, info);
 
