@@ -321,7 +321,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult restart(final boolean masterReset, final int eraseCode, final int channel)
+	public ServiceResult restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
 	{
 		super.restart(masterReset, eraseCode, channel);
 		if (device.getAddress().equals(new IndividualAddress(1, 1, 4)))
