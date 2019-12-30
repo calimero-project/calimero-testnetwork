@@ -47,6 +47,8 @@ import java.util.List;
 
 import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
+import tuwien.auto.calimero.device.ios.InterfaceObject;
+import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.ManagementClient;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
@@ -110,6 +112,7 @@ public class TestNetwork implements Runnable
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
+			final var ios = launcher.getGateway().getServer().getInterfaceObjectServer();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
 				return;
@@ -119,6 +122,9 @@ public class TestNetwork implements Runnable
 
 			final KnxDevice d4 = createDevice("1.1.4", link);
 			/*final KnxDevice d5 =*/ createDevice("1.1.5", link);
+
+			routerObjectIndex = interfaceObjectIndex(ios, InterfaceObject.ROUTER_OBJECT);
+
 			System.out.println("Test network is up and running");
 
 			boolean state = true;
@@ -183,10 +189,12 @@ public class TestNetwork implements Runnable
 	private static final int A_FunctionPropertyCommand = 0b1011000111;
 	private static final int pidIpSbcControl = 120;
 
+	private int routerObjectIndex;
+
 	private void sendSystemBroadcasts(final BaseKnxDevice device) throws KNXException, InterruptedException {
 		try (ManagementClient mgmt = new ManagementClientImpl(device.getDeviceLink(), device.transportLayer()) {}) {
 			// enable server system broadcast mode
-			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) 3, (byte) pidIpSbcControl,
+			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) routerObjectIndex, (byte) pidIpSbcControl,
 					(byte) 0, (byte) 0, (byte) 1);
 			device.transportLayer().sendData(new IndividualAddress(1, 1, 0), Priority.LOW, tsdu);
 
@@ -219,8 +227,8 @@ public class TestNetwork implements Runnable
 		}
 		finally {
 			// disable server system broadcast mode
-			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) 3, (byte) pidIpSbcControl,
-					(byte) 0, (byte) 0, (byte) 0);
+			final var tsdu = DataUnitBuilder.createAPDU(A_FunctionPropertyCommand, (byte) routerObjectIndex,
+					(byte) pidIpSbcControl, (byte) 0, (byte) 0, (byte) 0);
 			device.transportLayer().sendData(new IndividualAddress(1, 1, 0), Priority.LOW, tsdu);
 		}
 	}
@@ -232,5 +240,12 @@ public class TestNetwork implements Runnable
 		final KNXNetworkLink devLink = downLink.createDeviceLink(ia);
 		final KnxDevice dev = new BaseKnxDevice("Device-" + ia.getDevice(), logic, devLink);
 		return dev;
+	}
+
+	private static int interfaceObjectIndex(final InterfaceObjectServer ios, final int interfaceObjectType) {
+		for (final var io : ios.getInterfaceObjects())
+			if (io.getType() == interfaceObjectType)
+				return io.getIndex();
+		return 0;
 	}
 }
