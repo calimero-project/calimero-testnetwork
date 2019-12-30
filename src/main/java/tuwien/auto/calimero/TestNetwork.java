@@ -131,7 +131,7 @@ public class TestNetwork implements Runnable
 			int intState = 13;
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
-					final String s = readStdio(UpdateInterval);
+					final String s = readStdin(UpdateInterval);
 					if ("exit".equals(s))
 						break;
 					if ("stat".equals(s))
@@ -168,7 +168,7 @@ public class TestNetwork implements Runnable
 		}
 	}
 
-	private String readStdio(final int timeout) throws InterruptedException, IOException {
+	private String readStdin(final int timeout) throws InterruptedException, IOException {
 		final long now = System.nanoTime();
 		final long end = now + timeout * 1_000_000L;
 
