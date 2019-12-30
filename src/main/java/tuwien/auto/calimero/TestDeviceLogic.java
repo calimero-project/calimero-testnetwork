@@ -321,10 +321,10 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	@Override
 	public ServiceResult restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
 	{
-		super.restart(masterReset, eraseCode, channel);
+		var result = super.restart(masterReset, eraseCode, channel);
 		if (device.getAddress().equals(new IndividualAddress(1, 1, 4)))
 			setProgrammingMode(true);
-		return null;
+		return result;
 	}
 
 	private static final int NetworkParameterRes = 0b1111011011;
