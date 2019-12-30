@@ -191,9 +191,6 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		}
 
 		final InterfaceObjectServer ios = device.getInterfaceObjectServer();
-		ios.addInterfaceObject(InterfaceObject.ADDRESSTABLE_OBJECT);
-		ios.addInterfaceObject(InterfaceObject.ASSOCIATIONTABLE_OBJECT);
-		ios.addInterfaceObject(InterfaceObject.INTERFACEPROGRAM_OBJECT);
 		ios.addInterfaceObject(InterfaceObject.KNXNETIP_PARAMETER_OBJECT);
 
 		// create interface object list for property PID_IO_LIST
