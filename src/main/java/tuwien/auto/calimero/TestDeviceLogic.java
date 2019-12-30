@@ -127,23 +127,23 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	TestDeviceLogic() throws KNXException
 	{
-		final List<StateDP> l = new ArrayList<StateDP>();
-		l.add(new StateDP(new GroupAddress("1/0/1"), "Bool", 0, DPTXlatorBoolean.DPT_BOOL.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/11"), "Bool 2", 0, DPTXlatorBoolean.DPT_ENABLE.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/111"), "Bool 3", 0, DPTXlatorBoolean.DPT_OCCUPANCY.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/2"), "", 0, DPTXlator3BitControlled.DPT_CONTROL_BLINDS.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/3"), "", 0, DPTXlator8BitUnsigned.DPT_SCALING.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/4"), "", 0, DPTXlator2ByteUnsigned.DPT_VALUE_2_UCOUNT.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/5"), "", 0, DPTXlatorString.DPT_STRING_8859_1.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/6"), "", 0, DPTXlator2ByteFloat.DPT_RAIN_AMOUNT.getID()));
-		l.add(new StateDP(new GroupAddress("1/0/7"), "", 0, DPTXlator4ByteFloat.DPT_ACCELERATION.getID()));
+		addDatapoint("0/0/7", DPTXlatorBoolean.DPT_SWITCH);
 
-		for (final StateDP dp : l) {
-			getDatapointModel().add(dp);
-			final String s = TranslatorTypes.createTranslator(0, dp.getDPT()).getValue();
-			state.put(dp.getMainAddress(), s);
-		}
+		addDatapoint("0/1/0", "input trigger", DPTXlatorBoolean.DPT_BOOL);
+		addDatapoint("0/1/1", "G1 switch", DPTXlatorBoolean.DPT_BOOL);
+		addDatapoint("0/1/2", "G2 switch",  DPTXlatorBoolean.DPT_BOOL);
+		addDatapoint("0/1/10", "switching input G2", DPTXlatorBoolean.DPT_BOOL);
+
+		addDatapoint("1/0/1", "Bool", DPTXlatorBoolean.DPT_BOOL);
+		addDatapoint("1/0/11", "Bool 2", DPTXlatorBoolean.DPT_ENABLE);
+		addDatapoint("1/0/111", "Bool 3", DPTXlatorBoolean.DPT_OCCUPANCY);
+		addDatapoint("1/0/2", DPTXlator3BitControlled.DPT_CONTROL_BLINDS);
+		addDatapoint("1/0/3", DPTXlator8BitUnsigned.DPT_SCALING);
+		addDatapoint("1/0/4", DPTXlator2ByteUnsigned.DPT_VALUE_2_UCOUNT);
+		addDatapoint("1/0/5", DPTXlatorString.DPT_STRING_8859_1);
 		state.put(new GroupAddress("1/0/5"), "Hello KNX!");
+		addDatapoint("1/0/6", DPTXlator2ByteFloat.DPT_RAIN_AMOUNT);
+		addDatapoint("1/0/7", DPTXlator4ByteFloat.DPT_ACCELERATION);
 
 		addDatapoint("1/0/200", DPTXlator2ByteUnsigned.DPT_ABSOLUTE_COLOR_TEMPERATURE);
 		addDatapoint("1/0/205", DptXlator16BitSet.DptRhccStatus);
@@ -151,7 +151,11 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	private void addDatapoint(String address, DPT dpt) throws KNXException {
-		StateDP dp = new StateDP(new GroupAddress(address), dpt.getDescription(), 0, dpt.getID());
+		addDatapoint(address, dpt.getDescription(), dpt);
+	}
+
+	private void addDatapoint(String address, String name, DPT dpt) throws KNXException {
+		StateDP dp = new StateDP(new GroupAddress(address), name, 0, dpt.getID());
 		getDatapointModel().add(dp);
 		final String s = TranslatorTypes.createTranslator(0, dp.getDPT()).getValue();
 		state.put(dp.getMainAddress(), s);
