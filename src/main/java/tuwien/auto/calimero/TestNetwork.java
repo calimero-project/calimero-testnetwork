@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.time.Duration;
 import java.util.List;
 
 import tuwien.auto.calimero.device.BaseKnxDevice;
@@ -53,7 +54,7 @@ import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.ManagementClient;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
 import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.process.ProcessCommunicationBase;
+import tuwien.auto.calimero.process.ProcessCommunication;
 import tuwien.auto.calimero.process.ProcessCommunicator;
 import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
 import tuwien.auto.calimero.server.Launcher;
@@ -149,8 +150,8 @@ public class TestNetwork implements Runnable
 						}
 						try {
 							intState = ++intState % 101;
-							pc.write(new GroupAddress("1/0/3"), intState, ProcessCommunicationBase.SCALING);
-							pc.readUnsigned(new GroupAddress("1/0/3"), ProcessCommunicationBase.SCALING);
+							pc.write(new GroupAddress("1/0/3"), intState, ProcessCommunication.SCALING);
+							pc.readUnsigned(new GroupAddress("1/0/3"), ProcessCommunication.SCALING);
 						}
 						catch (final KNXException e) {
 							System.out.println(e);
@@ -204,7 +205,7 @@ public class TestNetwork implements Runnable
 			// this should be forwarded normally (not as sysbcast)
 //			mgmt.writeDomainAddress(sno, new byte[] { 1, 2 });
 
-			mgmt.setResponseTimeout(1);
+			mgmt.responseTimeout(Duration.ofSeconds(1));
 			final byte operand = 1;
 			try {
 				mgmt.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, operand);
