@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2019 B. Malinowsky
+    Copyright (c) 2010, 2020 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.LinkProcedure;
-import tuwien.auto.calimero.device.ManagementService.EraseCode;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
@@ -394,6 +393,8 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final byte[] a1 = new IndividualAddress("1.1.5").toByteArray();
 			final byte[] a2 = new IndividualAddress("1.1.6").toByteArray();
 			final byte[] a3 = new IndividualAddress("1.1.7").toByteArray();
+			int idx = ios.getProperty(knxObject, 1, PID.OBJECT_INDEX, 1, 1)[0];
+			ios.setDescription(new Description(idx, knxObject, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 0, 0, true, 0, 10, 3, 3), true);
 			ios.setProperty(knxObject, objectInstance, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 1, 1, a1);
 			ios.setProperty(knxObject, objectInstance, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 2, 1, a2);
 			ios.setProperty(knxObject, objectInstance, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 3, 1, a3);
@@ -439,7 +440,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	private void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
 	{
 		try {
-			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, new byte[] { value });
+			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, new byte[] { value, value, value, value, value });
 			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { value });
 			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, new byte[] { value });
 			ios.setProperty(idx, PropertyAccess.PID.ERROR_CODE, 1, 1, new byte[] { 8 });
