@@ -67,6 +67,9 @@ public class TestNetwork implements Runnable
 	// loop interval [ms] of issuing read/write datapoint requests to keep a "live" network
 	private static final int UpdateInterval = 10000;
 
+	static final IndividualAddress programmableDevice = new IndividualAddress(1, 1, 4);
+	static final IndividualAddress responderDevice = new IndividualAddress(1, 1, 5);
+
 	private final String configURI;
 
 	/**
@@ -121,8 +124,8 @@ public class TestNetwork implements Runnable
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
 			final VirtualLink link = (VirtualLink) connectors.get(0).getSubnetLink();
 
-			final KnxDevice d4 = createDevice("1.1.4", link);
-			/*final KnxDevice d5 =*/ createDevice("1.1.5", link);
+			final KnxDevice d4 = createDevice(programmableDevice, link);
+			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
 
 			routerObjectIndex = interfaceObjectIndex(ios, InterfaceObject.ROUTER_OBJECT);
 
@@ -234,12 +237,15 @@ public class TestNetwork implements Runnable
 		}
 	}
 
-	private static KnxDevice createDevice(final String address, final VirtualLink downLink) throws KNXException
+	private static KnxDevice createDevice(final IndividualAddress address, final VirtualLink downLink) throws KNXException
 	{
-		final IndividualAddress ia = new IndividualAddress(address);
 		final TestDeviceLogic logic = new TestDeviceLogic();
-		final KNXNetworkLink devLink = downLink.createDeviceLink(ia);
-		final KnxDevice dev = new BaseKnxDevice("Device-" + ia.getDevice(), logic, devLink);
+		final KNXNetworkLink devLink = downLink.createDeviceLink(address);
+		final var dev = new BaseKnxDevice("Device-" + address.getDevice(), logic, devLink);
+		final int last = address.getDevice() + 1;
+		final byte[] serialNo = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last };
+		final byte[] hardwareType = DataUnitBuilder.fromHex("00000000021A");
+		dev.identification(DeviceDescriptor.DD0.TYPE_2705, 0x83, serialNo, hardwareType, new byte[5], new byte[16]);
 		return dev;
 	}
 

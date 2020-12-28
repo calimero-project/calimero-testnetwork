@@ -58,6 +58,7 @@ import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.LinkProcedure;
+import tuwien.auto.calimero.device.ManagementService.EraseCode;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
@@ -74,6 +75,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
 import tuwien.auto.calimero.knxnetip.Discoverer;
+import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.mgmt.Description;
 import tuwien.auto.calimero.mgmt.Destination;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
@@ -168,9 +170,9 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		for (int i = 0; i < 1000; i++)
 			writeMemory(i, new byte[] { (byte) i });
 
-		if (device.getAddress().toString().equals("1.1.4"))
+		if (device.getAddress().equals(TestNetwork.programmableDevice))
 			setProgrammingMode(true);
-		if (device.getAddress().toString().equals("1.1.5"))
+		if (device.getAddress().equals(TestNetwork.responderDevice))
 			isResponder.addAll(((DatapointMap<Datapoint>) getDatapointModel()).getDatapoints());
 
 		// the rest here just sets some arbitrary values in interface objects required for testing
@@ -188,6 +190,12 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final byte[] serialNo = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last };
 			ios.setProperty(0, PID.SERIAL_NUMBER, 1, 1, serialNo);
 			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 1, 3, 0), true);
+
+			if (device.getDeviceLink().getKNXMedium() instanceof RFSettings) {
+				var rfObject = ios.addInterfaceObject(InterfaceObject.RF_MEDIUM_OBJECT);
+				int pidRfMultiType = 51;
+				ios.setProperty(rfObject.getIndex(), pidRfMultiType, 1, 1, (byte) 0);
+			}
 		}
 		catch (final RuntimeException e) {
 			e.printStackTrace();
@@ -246,12 +254,6 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	public void updateDatapointValue(final Datapoint ofDp, final DPTXlator update)
 	{
 		state.put(ofDp.getMainAddress(), update.getValue());
-	}
-
-	@Override
-	public boolean isVerifyModeEnabled()
-	{
-		return false;
 	}
 
 	@Override
