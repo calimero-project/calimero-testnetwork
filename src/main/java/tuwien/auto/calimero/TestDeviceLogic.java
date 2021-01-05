@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,6 @@ import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
 import tuwien.auto.calimero.device.LinkProcedure;
-import tuwien.auto.calimero.device.ManagementService.EraseCode;
 import tuwien.auto.calimero.device.ServiceResult;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
 import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
@@ -269,7 +268,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		if (objectType != 0 || pid != 59)
 			return super.readParameter(objectType, pid, info);
 
-		final boolean broadcast = false; // dst.equals(new GroupAddress(0, 0, 0)); // XXX
+		final boolean broadcast = false; // dst.equals(GroupAddress.Broadcast); // XXX
 		final byte[] response = new byte[1];
 		response[0] = 0xa;
 		final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
