@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2020 B. Malinowsky
+    Copyright (c) 2010, 2021 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -243,7 +243,7 @@ public class TestNetwork implements Runnable
 		final KNXNetworkLink devLink = downLink.createDeviceLink(address);
 		final var dev = new BaseKnxDevice("Device-" + address.getDevice(), logic, devLink);
 		final int last = address.getDevice() + 1;
-		final byte[] serialNo = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last };
+		final var serialNo = SerialNumber.from(new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last });
 		final byte[] hardwareType = DataUnitBuilder.fromHex("00000000021A");
 		dev.identification(DeviceDescriptor.DD0.TYPE_2705, 0x83, serialNo, hardwareType, new byte[5], new byte[16]);
 		return dev;
