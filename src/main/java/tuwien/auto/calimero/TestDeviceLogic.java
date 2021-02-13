@@ -41,6 +41,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -257,14 +258,14 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult readParameter(int objectType, int pid, byte[] info) {
+	public ServiceResult<byte[]> readParameter(int objectType, int pid, byte[] info) {
 		if (objectType == InterfaceObject.ADDRESSTABLE_OBJECT && pid == PID.TABLE && info.length == 3) {
 			int range = info[0] & 0xff;
 			int startAddress = (info[1] & 0xff) << 8 | info[2] & 0xff;
 			for (int i = 0; i < range; i++)
 				if (state.containsKey(new GroupAddress(startAddress + i)))
-					return new ServiceResult(info);
-			return null;
+					return ServiceResult.of(info);
+			return new ServiceResult<>();
 		}
 		if (objectType != 0 || pid != 59)
 			return super.readParameter(objectType, pid, info);
@@ -281,7 +282,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		return new ServiceResult(response);
+		return ServiceResult.of(response);
 	}
 
 	@Override
@@ -304,27 +305,27 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult readADC(final int channel, final int consecutiveReads)
+	public ServiceResult<Integer> readADC(final int channel, final int consecutiveReads)
 	{
-		return new ServiceResult(new byte[] { (byte) channel, (byte) consecutiveReads, 0x1, 0x0 });
+		return ServiceResult.of(0x100);
 	}
 
 	@Override
-	public ServiceResult authorize(final Destination remote, final byte[] key)
+	public ServiceResult<Integer> authorize(final Destination remote, final byte[] key)
 	{
 		final byte[] validKey = new byte[] { 0x10, 0x20, 0x30, 0x40 };
 		final int levelValid = 2;
 
 		if (Arrays.equals(key, validKey)) {
 			final int currentLevel = levelValid;
-			return new ServiceResult((byte) currentLevel);
+			return ServiceResult.of(currentLevel);
 		}
 		else
 			return super.authorize(remote, key);
 	}
 
 	@Override
-	public ServiceResult restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
+	public ServiceResult<Duration> restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
 	{
 		var result = super.restart(masterReset, eraseCode, channel);
 		if (device.getAddress().equals(new IndividualAddress(1, 1, 4)))
@@ -336,7 +337,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	private static final int SystemNetworkParamResponse = 0b0111001001;
 
 	@Override
-	public ServiceResult management(final int svcType, final byte[] asdu, final KNXAddress dst,
+	public ServiceResult<byte[]> management(final int svcType, final byte[] asdu, final KNXAddress dst,
 		final Destination respondTo, final TransportLayer tl)
 	{
 		if (svcType == NetworkParameterRes || svcType == SystemNetworkParamResponse)
