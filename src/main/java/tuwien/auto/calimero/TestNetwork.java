@@ -128,6 +128,14 @@ public class TestNetwork implements Runnable
 
 			routerObjectIndex = ios.lookup(InterfaceObject.ROUTER_OBJECT, 1).getIndex();
 
+			// set baos properties for mode switch testing
+			final int pidBaosSupport = 201;
+			ios.setProperty(8, 1, pidBaosSupport, 1, 1, (byte) 1);
+			final int pidCommMode = 52; // PID.COMM_MODE
+			ios.setProperty(8, 1, pidCommMode, 1, 1, (byte) 0);
+
+
+
 			System.out.println("Test network is up and running");
 
 			boolean state = true;
