@@ -22,7 +22,7 @@ compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 
 group = 'com.github.calimero'
-version = '2.5-SNAPSHOT'
+version = '2.5-M1'
 
 repositories {        
     mavenLocal()
