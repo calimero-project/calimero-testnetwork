@@ -49,7 +49,6 @@ import java.util.List;
 import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
-import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.ManagementClient;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
@@ -127,7 +126,7 @@ public class TestNetwork implements Runnable
 			final KnxDevice d4 = createDevice(programmableDevice, link);
 			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
 
-			routerObjectIndex = interfaceObjectIndex(ios, InterfaceObject.ROUTER_OBJECT);
+			routerObjectIndex = ios.lookup(InterfaceObject.ROUTER_OBJECT, 1).getIndex();
 
 			System.out.println("Test network is up and running");
 
@@ -247,12 +246,5 @@ public class TestNetwork implements Runnable
 		final byte[] hardwareType = DataUnitBuilder.fromHex("00000000021A");
 		dev.identification(DeviceDescriptor.DD0.TYPE_2705, 0x83, serialNo, hardwareType, new byte[5], new byte[16]);
 		return dev;
-	}
-
-	private static int interfaceObjectIndex(final InterfaceObjectServer ios, final int interfaceObjectType) {
-		for (final var io : ios.getInterfaceObjects())
-			if (io.getType() == interfaceObjectType)
-				return io.getIndex();
-		return 0;
 	}
 }
