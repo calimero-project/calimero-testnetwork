@@ -40,7 +40,7 @@ dependencies {
     implementation group:group, name: 'calimero-server', version:version
     implementation group:group, name: 'calimero-core', version:version
     implementation group:group, name: 'calimero-device', version:version
-    runtimeOnly 'org.slf4j:slf4j-simple:2.0.0-alpha1'
+    runtimeOnly 'org.slf4j:slf4j-simple:1.7.30'
 }
 
 uploadArchives {
