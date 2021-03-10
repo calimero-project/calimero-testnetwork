@@ -1,12 +1,12 @@
 plugins {
-  id "com.github.ben-manes.versions" version "0.38.0"
+    id 'java'
+    id 'application'
+    id 'eclipse'
+    id "com.github.ben-manes.versions" version "0.38.0"
+    id 'maven-publish'
+    id 'signing'
 }
 
-apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'eclipse'
-
-apply plugin:'application'
 mainClassName = "tuwien.auto.calimero.TestNetwork"
 
 run {
@@ -32,9 +32,25 @@ repositories {
 
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
-	'-Xlint:-options',
-	'-Werror'
+	'-Xlint:-options'
 ]
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+tasks.withType(Jar) {
+	from("${projectDir}") {
+        include 'LICENSE'
+        into "META-INF"
+    }
+    if (name.equals('sourcesJar')) {
+    	from("${projectDir}") {
+		    include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
+        }
+    }
+}
 
 dependencies {
     implementation group:group, name: 'calimero-server', version:version
@@ -43,12 +59,45 @@ dependencies {
     runtimeOnly 'org.slf4j:slf4j-simple:1.7.30'
 }
 
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url:"https://oss.sonatype.org/content/repositories/snapshots") {
-                authentication(userName: findProperty('mavenUser'), password: findProperty('mavenPassword'))
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = rootProject.name
+            from components.java
+            pom {
+                name = 'Calimero test network'
+                description = 'Test network with KNXnet/IP server and virtual subnet'
+                url = 'https://github.com/calimero-project/calimero-testnetwork'
+                licenses {
+                    license {
+                        name = "GNU General Public License, version 2, with the Classpath Exception"
+                        url = 'LICENSE'
+                    }
+                }
+                developers {
+                    developer {
+                        name = "Boris Malinowsky"
+                        email = "b.malinowsky@gmail.com"
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git://github.com:calimero-project/calimero-testnetwork.git'
+                    url = 'https://github.com/calimero-project/calimero-testnetwork.git'
+                }
             }
         }
     }
+    repositories {
+        maven {
+            name 'maven'
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials(PasswordCredentials)
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
 }
