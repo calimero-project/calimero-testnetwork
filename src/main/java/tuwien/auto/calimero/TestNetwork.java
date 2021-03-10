@@ -61,6 +61,9 @@ import tuwien.auto.calimero.server.VirtualLink;
 import tuwien.auto.calimero.server.gateway.KnxServerGateway;
 import tuwien.auto.calimero.server.gateway.SubnetConnector;
 
+/**
+ * The test network setup.
+ */
 public class TestNetwork implements Runnable
 {
 	// loop interval [ms] of issuing read/write datapoint requests to keep a "live" network
@@ -82,6 +85,9 @@ public class TestNetwork implements Runnable
 			new TestNetwork(args).run();
 	}
 
+	/**
+	 * @param args server config URI
+	 */
 	public TestNetwork(final String[] args)
 	{
 		configURI = args[0];
@@ -179,7 +185,7 @@ public class TestNetwork implements Runnable
 		}
 	}
 
-	private String readStdin(final int timeout) throws InterruptedException, IOException {
+	private static String readStdin(final int timeout) throws InterruptedException, IOException {
 		final long now = System.nanoTime();
 		final long end = now + timeout * 1_000_000L;
 

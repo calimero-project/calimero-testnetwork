@@ -74,7 +74,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
-import tuwien.auto.calimero.knxnetip.Discoverer;
+import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.mgmt.Description;
 import tuwien.auto.calimero.mgmt.Destination;
@@ -94,18 +94,11 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	// PID.PROJECT_INSTALLATION_ID
 	private static final int defProjectInstallationId = 0;
 	// PID.ROUTING_MULTICAST_ADDRESS
-	private static final InetAddress defRoutingMulticast;
+	private static final InetAddress defRoutingMulticast = KNXnetIPRouting.DefaultMulticast;
 	// PID.MAC_ADDRESS
 	private static final byte[] defMacAddress;
 
 	static {
-		InetAddress a = null;
-		try {
-			a = InetAddress.getByName(Discoverer.SEARCH_MULTICAST);
-		}
-		catch (final UnknownHostException e) {}
-		defRoutingMulticast = a;
-
 		byte[] mac = null;
 		try {
 			mac = NetworkInterface.getByInetAddress(InetAddress.getLocalHost()).getHardwareAddress();
@@ -320,8 +313,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final int currentLevel = levelValid;
 			return ServiceResult.of(currentLevel);
 		}
-		else
-			return super.authorize(remote, key);
+		return super.authorize(remote, key);
 	}
 
 	@Override
@@ -352,7 +344,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	// precondition: we have an IOS instance
-	private void initKNXnetIpParameterObject(final InterfaceObjectServer ios, final int objectInstance)
+	private static void initKNXnetIpParameterObject(final InterfaceObjectServer ios, final int objectInstance)
 		throws KnxPropertyException
 	{
 		final int knxObject = 11;
@@ -430,7 +422,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		ios.setProperty(knxObject, objectInstance, PID.CURRENT_IP_ASSIGNMENT_METHOD, 1, 1, new byte[] { 1 });
 	}
 
-	private void resetRoutingConfiguration(final InterfaceObjectServer ios)
+	private static void resetRoutingConfiguration(final InterfaceObjectServer ios)
 	{
 		// routing multicast shall be set 0 if no routing service offered
 		try {
@@ -440,7 +432,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		catch (final KnxPropertyException e) {}
 	}
 
-	private void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
+	private static void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
 	{
 		try {
 			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, new byte[] { value, value, value, value, value });
