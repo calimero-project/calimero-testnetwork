@@ -2,9 +2,9 @@ name: CI with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feat/loom ]
   pull_request:
-    branches: [ master ]
+    branches: [ feat/loom ]
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        java: [11, 17]
+        java: [19]
     name: Java ${{ matrix.java }} sample
 
     steps:
@@ -21,11 +21,13 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: calimero-project/calimero-core
+        ref: feat/loom
         path: calimero-core
     - name: Checkout calimero-device
       uses: actions/checkout@v2
       with:
         repository: calimero-project/calimero-device
+        ref: feat/loom
         path: calimero-device
     - name: Checkout calimero-rxtx
       uses: actions/checkout@v2
@@ -36,6 +38,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         repository: calimero-project/calimero-server
+        ref: feat/loom
         path: calimero-server
     - name: Checkout calimero-testnetwork
       uses: actions/checkout@v2

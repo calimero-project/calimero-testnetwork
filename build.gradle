@@ -15,8 +15,8 @@ run {
     standardInput = System.in
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
+sourceCompatibility = 19
+targetCompatibility = 19
 
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
@@ -32,9 +32,11 @@ repositories {
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
 }
 
+tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
+
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
-	'-Xlint:-options'
+	'--enable-preview',
 ]
 
 java {
@@ -54,10 +56,15 @@ tasks.withType(Jar) {
     }
 }
 
+tasks.withType(Javadoc) {
+    options.addBooleanOption('-enable-preview', true)
+	options.addStringOption("-release", "${targetCompatibility}")
+}
+
 dependencies {
-    implementation group:group, name: 'calimero-server', version:version
-    implementation group:group, name: 'calimero-core', version:version
-    implementation group:group, name: 'calimero-device', version:version
+    implementation group:group, name: 'calimero-server-loom', version:version
+    implementation group:group, name: 'calimero-core-loom', version:version
+    implementation group:group, name: 'calimero-device-loom', version:version
     runtimeOnly 'org.slf4j:slf4j-simple:1.7.36'
 }
 
@@ -67,7 +74,7 @@ publishing {
             artifactId = rootProject.name
             from components.java
             pom {
-                name = 'Calimero test network'
+                name = 'Calimero test network (Loom)'
                 description = 'Test network with KNXnet/IP server and virtual subnet'
                 url = 'https://github.com/calimero-project/calimero-testnetwork'
                 licenses {

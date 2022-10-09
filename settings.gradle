@@ -1,4 +1,4 @@
-rootProject.name = 'calimero-testnetwork'
+rootProject.name = 'calimero-testnetwork-loom'
 
 def safeIncludeBuild(String dir) {
 	boolean inComposite = gradle.parent != null

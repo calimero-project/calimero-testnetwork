@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import java.util.List;
 import tuwien.auto.calimero.device.BaseKnxDevice;
 import tuwien.auto.calimero.device.KnxDevice;
 import tuwien.auto.calimero.device.ios.InterfaceObject;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.link.KNXNetworkLink;
 import tuwien.auto.calimero.mgmt.ManagementClient;
 import tuwien.auto.calimero.mgmt.ManagementClientImpl;
@@ -116,8 +117,7 @@ public class TestNetwork implements Runnable
 		}
 
 		try (var launcher = new Launcher(configURI)) {
-			final Thread t = new Thread(launcher);
-			t.start();
+			Executor.execute(launcher);
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();

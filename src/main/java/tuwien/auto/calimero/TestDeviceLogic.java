@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2022 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -74,6 +74,7 @@ import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
 import tuwien.auto.calimero.dptxlator.DPTXlatorString;
 import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
 import tuwien.auto.calimero.dptxlator.TranslatorTypes;
+import tuwien.auto.calimero.internal.Executor;
 import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
 import tuwien.auto.calimero.link.medium.RFSettings;
 import tuwien.auto.calimero.mgmt.Description;
@@ -285,7 +286,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final LinkProcedure lp = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
 					groupObjects);
 			lp.setLinkFunction(this::onLinkResponse);
-			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
+			Executor.execute(lp, device.getAddress() + " Link Procedure Thread");
 		}
 	}
 
