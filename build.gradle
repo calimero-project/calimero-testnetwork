@@ -24,7 +24,7 @@ javadoc.options.encoding = 'UTF-8'
 
 
 group = 'com.github.calimero'
-version = '2.6-SNAPSHOT'
+version = '2.5.1'
 
 repositories {        
     mavenLocal()
