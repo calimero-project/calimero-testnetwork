@@ -36,6 +36,9 @@
 
 package io.calimero.testnetwork;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -48,9 +51,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.calimero.GroupAddress;
 import io.calimero.IndividualAddress;
@@ -81,6 +81,7 @@ import io.calimero.dptxlator.DptXlator16BitSet;
 import io.calimero.dptxlator.TranslatorTypes;
 import io.calimero.knxnetip.KNXnetIPRouting;
 import io.calimero.link.medium.RFSettings;
+import io.calimero.log.LogService;
 import io.calimero.mgmt.Description;
 import io.calimero.mgmt.Destination;
 import io.calimero.mgmt.ManagementClient.EraseCode;
@@ -94,7 +95,7 @@ import io.calimero.mgmt.TransportLayer;
  */
 class TestDeviceLogic extends KnxDeviceServiceLogic
 {
-	private static final Logger logger = LoggerFactory.getLogger(TestDeviceLogic.class);
+	private static final Logger logger = LogService.getLogger(MethodHandles.lookup().lookupClass());
 
 	// PID.PROJECT_INSTALLATION_ID
 	private static final int defProjectInstallationId = 0;
@@ -265,7 +266,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		response[0] = 0xa;
 		final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
 		final int wait = broadcast ? new Random().nextInt(10 * tmedium) : 0;
-		logger.debug("add random wait time of " + wait + " ms before response");
+		logger.log(Level.DEBUG, "add random wait time of " + wait + " ms before response");
 		try {
 			Thread.sleep(wait);
 		}
@@ -336,7 +337,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
 	{
-		logger.info("link response: flags " + flags + " and group objects " + groupObjects);
+		logger.log(Level.INFO, "link response: flags " + flags + " and group objects " + groupObjects);
 		return 0;
 	}
 
