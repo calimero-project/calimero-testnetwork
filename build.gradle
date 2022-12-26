@@ -30,6 +30,7 @@ repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
 }
 
 compileJava.options*.compilerArgs = [
@@ -83,7 +84,7 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com:calimero-project/calimero-testnetwork.git'
+                    connection = 'scm:git:git://github.com/calimero-project/calimero-testnetwork.git'
                     url = 'https://github.com/calimero-project/calimero-testnetwork.git'
                 }
             }
