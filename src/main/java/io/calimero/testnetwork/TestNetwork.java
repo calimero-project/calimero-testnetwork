@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package io.calimero.testnetwork;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -46,20 +46,28 @@ import java.io.RandomAccessFile;
 import java.time.Duration;
 import java.util.List;
 
-import tuwien.auto.calimero.device.BaseKnxDevice;
-import tuwien.auto.calimero.device.KnxDevice;
-import tuwien.auto.calimero.device.ios.InterfaceObject;
-import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.mgmt.ManagementClient;
-import tuwien.auto.calimero.mgmt.ManagementClientImpl;
-import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.process.ProcessCommunication;
-import tuwien.auto.calimero.process.ProcessCommunicator;
-import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
-import tuwien.auto.calimero.server.Launcher;
-import tuwien.auto.calimero.server.VirtualLink;
-import tuwien.auto.calimero.server.gateway.KnxServerGateway;
-import tuwien.auto.calimero.server.gateway.SubnetConnector;
+import io.calimero.DataUnitBuilder;
+import io.calimero.DeviceDescriptor;
+import io.calimero.GroupAddress;
+import io.calimero.IndividualAddress;
+import io.calimero.KNXException;
+import io.calimero.KNXTimeoutException;
+import io.calimero.Priority;
+import io.calimero.SerialNumber;
+import io.calimero.device.BaseKnxDevice;
+import io.calimero.device.KnxDevice;
+import io.calimero.device.ios.InterfaceObject;
+import io.calimero.link.KNXNetworkLink;
+import io.calimero.mgmt.ManagementClient;
+import io.calimero.mgmt.ManagementClientImpl;
+import io.calimero.mgmt.PropertyAccess.PID;
+import io.calimero.process.ProcessCommunication;
+import io.calimero.process.ProcessCommunicator;
+import io.calimero.process.ProcessCommunicatorImpl;
+import io.calimero.server.Launcher;
+import io.calimero.server.VirtualLink;
+import io.calimero.server.gateway.KnxServerGateway;
+import io.calimero.server.gateway.SubnetConnector;
 
 /**
  * The test network setup.

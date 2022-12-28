@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package io.calimero.testnetwork;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -52,37 +52,42 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import tuwien.auto.calimero.datapoint.Datapoint;
-import tuwien.auto.calimero.datapoint.DatapointMap;
-import tuwien.auto.calimero.datapoint.StateDP;
-import tuwien.auto.calimero.device.BaseKnxDevice;
-import tuwien.auto.calimero.device.KnxDevice;
-import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
-import tuwien.auto.calimero.device.LinkProcedure;
-import tuwien.auto.calimero.device.ServiceResult;
-import tuwien.auto.calimero.device.ios.InterfaceObject;
-import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
-import tuwien.auto.calimero.device.ios.KnxPropertyException;
-import tuwien.auto.calimero.dptxlator.DPT;
-import tuwien.auto.calimero.dptxlator.DPTXlator;
-import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
-import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
-import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled;
-import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
-import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
-import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
-import tuwien.auto.calimero.dptxlator.DPTXlatorString;
-import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
-import tuwien.auto.calimero.dptxlator.TranslatorTypes;
-import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
-import tuwien.auto.calimero.link.medium.RFSettings;
-import tuwien.auto.calimero.mgmt.Description;
-import tuwien.auto.calimero.mgmt.Destination;
-import tuwien.auto.calimero.mgmt.ManagementClient.EraseCode;
-import tuwien.auto.calimero.mgmt.ManagementClientImpl;
-import tuwien.auto.calimero.mgmt.PropertyAccess;
-import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.mgmt.TransportLayer;
+import io.calimero.GroupAddress;
+import io.calimero.IndividualAddress;
+import io.calimero.KNXAddress;
+import io.calimero.KNXException;
+import io.calimero.KNXFormatException;
+import io.calimero.datapoint.Datapoint;
+import io.calimero.datapoint.DatapointMap;
+import io.calimero.datapoint.StateDP;
+import io.calimero.device.BaseKnxDevice;
+import io.calimero.device.KnxDevice;
+import io.calimero.device.KnxDeviceServiceLogic;
+import io.calimero.device.LinkProcedure;
+import io.calimero.device.ServiceResult;
+import io.calimero.device.ios.InterfaceObject;
+import io.calimero.device.ios.InterfaceObjectServer;
+import io.calimero.device.ios.KnxPropertyException;
+import io.calimero.dptxlator.DPT;
+import io.calimero.dptxlator.DPTXlator;
+import io.calimero.dptxlator.DPTXlator2ByteFloat;
+import io.calimero.dptxlator.DPTXlator2ByteUnsigned;
+import io.calimero.dptxlator.DPTXlator3BitControlled;
+import io.calimero.dptxlator.DPTXlator4ByteFloat;
+import io.calimero.dptxlator.DPTXlator8BitUnsigned;
+import io.calimero.dptxlator.DPTXlatorBoolean;
+import io.calimero.dptxlator.DPTXlatorString;
+import io.calimero.dptxlator.DptXlator16BitSet;
+import io.calimero.dptxlator.TranslatorTypes;
+import io.calimero.knxnetip.KNXnetIPRouting;
+import io.calimero.link.medium.RFSettings;
+import io.calimero.mgmt.Description;
+import io.calimero.mgmt.Destination;
+import io.calimero.mgmt.ManagementClient.EraseCode;
+import io.calimero.mgmt.ManagementClientImpl;
+import io.calimero.mgmt.PropertyAccess;
+import io.calimero.mgmt.PropertyAccess.PID;
+import io.calimero.mgmt.TransportLayer;
 
 /**
  * Test device logic for KNX devices in our test network.
