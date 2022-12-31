@@ -7,7 +7,10 @@ plugins {
     id 'signing'
 }
 
-mainClassName = "io.calimero.TestNetwork"
+application {
+    mainModule = 'io.calimero.testnetwork' 
+    mainClass = 'io.calimero.testnetwork.TestNetwork'
+}
 
 run {
     systemProperties System.getProperties()
