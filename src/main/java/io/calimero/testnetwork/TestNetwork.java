@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,11 +129,11 @@ public class TestNetwork implements Runnable
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
-			final var ios = launcher.getGateway().getServer().getInterfaceObjectServer();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
 				return;
 			}
+			final var ios = gw.getServer().getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
 			final VirtualLink link = (VirtualLink) connectors.get(0).getSubnetLink();
 
@@ -198,7 +198,7 @@ public class TestNetwork implements Runnable
 		final long end = now + timeout * 1_000_000L;
 
 		final var reader = new BufferedReader(new InputStreamReader(System.in));
-		String line = "";
+		String line;
 		do {
 			while (!reader.ready()) {
 				if (System.nanoTime() > end)

@@ -46,14 +46,14 @@ java {
     withJavadocJar()
 }
 
-tasks.withType(Jar) {
-	from("${projectDir}") {
+tasks.withType(Jar).configureEach {
+    from("${projectDir}") {
         include 'LICENSE'
         into "META-INF"
     }
     if (name.equals('sourcesJar')) {
-    	from("${projectDir}") {
-		    include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
+        from("${projectDir}") {
+            include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
         }
     }
 }

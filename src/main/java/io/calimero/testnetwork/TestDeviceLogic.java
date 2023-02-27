@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2021 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,6 +41,7 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -355,7 +356,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		//
 		// friendly name property entry is an array of 30 characters
 		final byte[] data = new byte[30];
-		System.arraycopy(friendlyName.getBytes(Charset.forName("ISO-8859-1")), 0, data, 0, friendlyName.length());
+		System.arraycopy(friendlyName.getBytes(StandardCharsets.ISO_8859_1), 0, data, 0, friendlyName.length());
 		ios.setProperty(knxObject, objectInstance, PID.FRIENDLY_NAME, 1, data.length, data);
 		ios.setProperty(knxObject, objectInstance, PID.PROJECT_INSTALLATION_ID, 1, 1,
 				bytesFromWord(defProjectInstallationId));
@@ -405,7 +406,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 				bytesFromWord(defDeviceCaps));
 
 		//
-		// set properties used in manufacturer data DIB for discovery self description
+		// set properties used in manufacturer data DIB for discovery self-description
 		//
 		final byte[] zero = new byte[1];
 		// we don't indicate any capabilities here, since executing the respective tasks
@@ -432,9 +433,9 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	private static void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
 	{
 		try {
-			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, new byte[] { value, value, value, value, value });
-			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { value });
-			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, new byte[] { value });
+			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, value, value, value, value, value);
+			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, value);
+			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, value);
 			ios.setProperty(idx, PropertyAccess.PID.ERROR_CODE, 1, 1, new byte[] { 8 });
 		}
 		catch (final KnxPropertyException e) {
