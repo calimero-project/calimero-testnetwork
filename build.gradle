@@ -51,7 +51,7 @@ tasks.withType(Jar).configureEach {
         include 'LICENSE'
         into "META-INF"
     }
-    if (name.equals('sourcesJar')) {
+    if (name == 'sourcesJar') {
         from("${projectDir}") {
             include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
         }

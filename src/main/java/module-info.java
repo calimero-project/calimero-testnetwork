@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2022, 2022 B. Malinowsky
+    Copyright (c) 2022, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,6 +34,9 @@
     version.
 */
 
+/**
+ * Defines the Calimero test-network API.
+ */
 module io.calimero.testnetwork {
 	requires io.calimero.core;
 	requires io.calimero.device;
