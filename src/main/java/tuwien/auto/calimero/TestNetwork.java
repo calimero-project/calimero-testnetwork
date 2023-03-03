@@ -75,6 +75,8 @@ public class TestNetwork implements Runnable
 	private final String configURI;
 
 	/**
+	 * Main entry-point.
+	 *
 	 * @param args server config URI
 	 */
 	public static void main(final String[] args)
@@ -86,6 +88,8 @@ public class TestNetwork implements Runnable
 	}
 
 	/**
+	 * Creates a new instance of the test network.
+	 *
 	 * @param args server config URI
 	 */
 	public TestNetwork(final String[] args)
