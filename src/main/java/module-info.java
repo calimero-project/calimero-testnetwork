@@ -41,6 +41,4 @@ module io.calimero.testnetwork {
 	requires io.calimero.core;
 	requires io.calimero.device;
 	requires io.calimero.server;
-
-	requires org.slf4j;
 }

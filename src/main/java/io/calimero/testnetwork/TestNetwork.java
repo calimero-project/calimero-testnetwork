@@ -108,9 +108,6 @@ public class TestNetwork implements Runnable
 	@Override
 	public void run()
 	{
-		System.getProperties().setProperty("org.slf4j.simpleLogger.logFile", "System.out");
-		System.getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "true");
-
 		final String netif = System.getProperty("calimero.testnetwork.netif");
 		if (netif != null) {
 			// using RandomAccessFile because Files.readAllBytes(path) doesn't resolve 'server-config.xml' to cwd
