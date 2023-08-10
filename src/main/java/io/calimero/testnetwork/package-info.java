@@ -38,4 +38,4 @@
  * Calimero test network using the calimero-server interface.
  */
 
-package tuwien.auto.calimero;
+package io.calimero.testnetwork;

@@ -2,12 +2,15 @@ plugins {
     id 'java'
     id 'application'
     id 'eclipse'
-    id "com.github.ben-manes.versions" version "0.42.0"
+    id "com.github.ben-manes.versions" version "0.46.0"
     id 'maven-publish'
     id 'signing'
 }
 
-mainClassName = "tuwien.auto.calimero.TestNetwork"
+application {
+    mainModule = 'io.calimero.testnetwork' 
+    mainClass = 'io.calimero.testnetwork.TestNetwork'
+}
 
 run {
     systemProperties System.getProperties()
@@ -23,13 +26,14 @@ compileTestJava.options.encoding = 'UTF-8'
 javadoc.options.encoding = 'UTF-8'
 
 
-group = 'com.github.calimero'
-version = '2.6-SNAPSHOT'
+group = 'io.calimero'
+version = '3.0-SNAPSHOT'
 
 repositories {        
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+    maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
 }
 
 tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
@@ -44,14 +48,14 @@ java {
     withJavadocJar()
 }
 
-tasks.withType(Jar) {
-	from("${projectDir}") {
+tasks.withType(Jar).configureEach {
+    from("${projectDir}") {
         include 'LICENSE'
         into "META-INF"
     }
-    if (name.equals('sourcesJar')) {
-    	from("${projectDir}") {
-		    include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
+    if (name == 'sourcesJar') {
+        from("${projectDir}") {
+            include 'README.md', 'build.gradle', 'settings.gradle', 'gradle*/**'
         }
     }
 }
@@ -65,7 +69,6 @@ dependencies {
     implementation group:group, name: 'calimero-server-loom', version:version
     implementation group:group, name: 'calimero-core-loom', version:version
     implementation group:group, name: 'calimero-device-loom', version:version
-    runtimeOnly 'org.slf4j:slf4j-simple:1.7.36'
 }
 
 publishing {
@@ -90,7 +93,7 @@ publishing {
                     }
                 }
                 scm {
-                    connection = 'scm:git:git://github.com:calimero-project/calimero-testnetwork.git'
+                    connection = 'scm:git:git://github.com/calimero-project/calimero-testnetwork.git'
                     url = 'https://github.com/calimero-project/calimero-testnetwork.git'
                 }
             }
@@ -99,8 +102,8 @@ publishing {
     repositories {
         maven {
             name 'maven'
-            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots/"
+            def releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
             credentials(PasswordCredentials)
         }

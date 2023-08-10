@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,13 +34,16 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package io.calimero.testnetwork;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
+import java.lang.invoke.MethodHandles;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,48 +52,50 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import tuwien.auto.calimero.datapoint.Datapoint;
-import tuwien.auto.calimero.datapoint.DatapointMap;
-import tuwien.auto.calimero.datapoint.StateDP;
-import tuwien.auto.calimero.device.BaseKnxDevice;
-import tuwien.auto.calimero.device.KnxDevice;
-import tuwien.auto.calimero.device.KnxDeviceServiceLogic;
-import tuwien.auto.calimero.device.LinkProcedure;
-import tuwien.auto.calimero.device.ServiceResult;
-import tuwien.auto.calimero.device.ios.InterfaceObject;
-import tuwien.auto.calimero.device.ios.InterfaceObjectServer;
-import tuwien.auto.calimero.device.ios.KnxPropertyException;
-import tuwien.auto.calimero.dptxlator.DPT;
-import tuwien.auto.calimero.dptxlator.DPTXlator;
-import tuwien.auto.calimero.dptxlator.DPTXlator2ByteFloat;
-import tuwien.auto.calimero.dptxlator.DPTXlator2ByteUnsigned;
-import tuwien.auto.calimero.dptxlator.DPTXlator3BitControlled;
-import tuwien.auto.calimero.dptxlator.DPTXlator4ByteFloat;
-import tuwien.auto.calimero.dptxlator.DPTXlator8BitUnsigned;
-import tuwien.auto.calimero.dptxlator.DPTXlatorBoolean;
-import tuwien.auto.calimero.dptxlator.DPTXlatorString;
-import tuwien.auto.calimero.dptxlator.DptXlator16BitSet;
-import tuwien.auto.calimero.dptxlator.TranslatorTypes;
-import tuwien.auto.calimero.internal.Executor;
-import tuwien.auto.calimero.knxnetip.KNXnetIPRouting;
-import tuwien.auto.calimero.link.medium.RFSettings;
-import tuwien.auto.calimero.mgmt.Description;
-import tuwien.auto.calimero.mgmt.Destination;
-import tuwien.auto.calimero.mgmt.ManagementClient.EraseCode;
-import tuwien.auto.calimero.mgmt.ManagementClientImpl;
-import tuwien.auto.calimero.mgmt.PropertyAccess;
-import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.mgmt.TransportLayer;
+import io.calimero.GroupAddress;
+import io.calimero.IndividualAddress;
+import io.calimero.KNXAddress;
+import io.calimero.KNXException;
+import io.calimero.KNXFormatException;
+import io.calimero.datapoint.Datapoint;
+import io.calimero.datapoint.DatapointMap;
+import io.calimero.datapoint.StateDP;
+import io.calimero.device.BaseKnxDevice;
+import io.calimero.device.KnxDevice;
+import io.calimero.device.KnxDeviceServiceLogic;
+import io.calimero.device.LinkProcedure;
+import io.calimero.device.ServiceResult;
+import io.calimero.device.ios.InterfaceObject;
+import io.calimero.device.ios.InterfaceObjectServer;
+import io.calimero.device.ios.KnxPropertyException;
+import io.calimero.dptxlator.DPT;
+import io.calimero.dptxlator.DPTXlator;
+import io.calimero.dptxlator.DPTXlator2ByteFloat;
+import io.calimero.dptxlator.DPTXlator2ByteUnsigned;
+import io.calimero.dptxlator.DPTXlator3BitControlled;
+import io.calimero.dptxlator.DPTXlator4ByteFloat;
+import io.calimero.dptxlator.DPTXlator8BitUnsigned;
+import io.calimero.dptxlator.DPTXlatorBoolean;
+import io.calimero.dptxlator.DPTXlatorString;
+import io.calimero.dptxlator.DptXlator16BitSet;
+import io.calimero.dptxlator.TranslatorTypes;
+import io.calimero.knxnetip.KNXnetIPRouting;
+import io.calimero.link.medium.RFSettings;
+import io.calimero.log.LogService;
+import io.calimero.mgmt.Description;
+import io.calimero.mgmt.Destination;
+import io.calimero.mgmt.ManagementClient.EraseCode;
+import io.calimero.mgmt.ManagementClientImpl;
+import io.calimero.mgmt.PropertyAccess;
+import io.calimero.mgmt.PropertyAccess.PID;
+import io.calimero.mgmt.TransportLayer;
 
 /**
  * Test device logic for KNX devices in our test network.
  */
 class TestDeviceLogic extends KnxDeviceServiceLogic
 {
-	private static final Logger logger = LoggerFactory.getLogger(TestDeviceLogic.class);
+	private static final Logger logger = LogService.getLogger(MethodHandles.lookup().lookupClass());
 
 	// PID.PROJECT_INSTALLATION_ID
 	private static final int defProjectInstallationId = 0;
@@ -261,7 +266,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		response[0] = 0xa;
 		final int tmedium = device.getDeviceLink().getKNXMedium().timeFactor();
 		final int wait = broadcast ? new Random().nextInt(10 * tmedium) : 0;
-		logger.debug("add random wait time of " + wait + " ms before response");
+		logger.log(Level.DEBUG, "add random wait time of " + wait + " ms before response");
 		try {
 			Thread.sleep(wait);
 		}
@@ -332,7 +337,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	private int onLinkResponse(final int flags, final Map<Integer, GroupAddress> groupObjects)
 	{
-		logger.info("link response: flags " + flags + " and group objects " + groupObjects);
+		logger.log(Level.INFO, "link response: flags " + flags + " and group objects " + groupObjects);
 		return 0;
 	}
 
@@ -351,7 +356,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		//
 		// friendly name property entry is an array of 30 characters
 		final byte[] data = new byte[30];
-		System.arraycopy(friendlyName.getBytes(Charset.forName("ISO-8859-1")), 0, data, 0, friendlyName.length());
+		System.arraycopy(friendlyName.getBytes(StandardCharsets.ISO_8859_1), 0, data, 0, friendlyName.length());
 		ios.setProperty(knxObject, objectInstance, PID.FRIENDLY_NAME, 1, data.length, data);
 		ios.setProperty(knxObject, objectInstance, PID.PROJECT_INSTALLATION_ID, 1, 1,
 				bytesFromWord(defProjectInstallationId));
@@ -401,7 +406,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 				bytesFromWord(defDeviceCaps));
 
 		//
-		// set properties used in manufacturer data DIB for discovery self description
+		// set properties used in manufacturer data DIB for discovery self-description
 		//
 		final byte[] zero = new byte[1];
 		// we don't indicate any capabilities here, since executing the respective tasks
@@ -428,9 +433,9 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	private static void setProgramData(final InterfaceObjectServer ios, final int idx, final byte value)
 	{
 		try {
-			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, new byte[] { value, value, value, value, value });
-			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, new byte[] { value });
-			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, new byte[] { value });
+			ios.setProperty(idx, PropertyAccess.PID.PROGRAM_VERSION, 1, 1, value, value, value, value, value);
+			ios.setProperty(idx, PropertyAccess.PID.LOAD_STATE_CONTROL, 1, 1, value);
+			ios.setProperty(idx, PropertyAccess.PID.RUN_STATE_CONTROL, 1, 1, value);
 			ios.setProperty(idx, PropertyAccess.PID.ERROR_CODE, 1, 1, new byte[] { 8 });
 		}
 		catch (final KnxPropertyException e) {

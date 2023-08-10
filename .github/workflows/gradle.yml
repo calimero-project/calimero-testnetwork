@@ -2,9 +2,9 @@ name: CI with Gradle
 
 on:
   push:
-    branches: [ feat/loom ]
+    branches: [ master ]
   pull_request:
-    branches: [ feat/loom ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -13,40 +13,41 @@ jobs:
 
     strategy:
       matrix:
-        java: [19]
+        java: [17, 19]
     name: Java ${{ matrix.java }} sample
 
     steps:
     - name: Checkout calimero-core
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: calimero-project/calimero-core
         ref: feat/loom
         path: calimero-core
     - name: Checkout calimero-device
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: calimero-project/calimero-device
         ref: feat/loom
         path: calimero-device
     - name: Checkout calimero-rxtx
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: calimero-project/calimero-rxtx
         path: calimero-rxtx
     - name: Checkout calimero-server
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         repository: calimero-project/calimero-server
         ref: feat/loom
         path: calimero-server
     - name: Checkout calimero-testnetwork
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         path: calimero-testnetwork
     - name: setup
-      uses: actions/setup-java@v1
+      uses: actions/setup-java@v3
       with:
+        distribution: temurin
         java-version: ${{ matrix.java }}
     - name: Grant execute permission for gradlew
       run: |

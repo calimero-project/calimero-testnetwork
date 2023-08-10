@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2022 B. Malinowsky
+    Copyright (c) 2010, 2023 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
     version.
 */
 
-package tuwien.auto.calimero;
+package io.calimero.testnetwork;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -44,23 +44,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
 import java.time.Duration;
+import java.util.HexFormat;
 import java.util.List;
 
-import tuwien.auto.calimero.device.BaseKnxDevice;
-import tuwien.auto.calimero.device.KnxDevice;
-import tuwien.auto.calimero.device.ios.InterfaceObject;
-import tuwien.auto.calimero.internal.Executor;
-import tuwien.auto.calimero.link.KNXNetworkLink;
-import tuwien.auto.calimero.mgmt.ManagementClient;
-import tuwien.auto.calimero.mgmt.ManagementClientImpl;
-import tuwien.auto.calimero.mgmt.PropertyAccess.PID;
-import tuwien.auto.calimero.process.ProcessCommunication;
-import tuwien.auto.calimero.process.ProcessCommunicator;
-import tuwien.auto.calimero.process.ProcessCommunicatorImpl;
-import tuwien.auto.calimero.server.Launcher;
-import tuwien.auto.calimero.server.VirtualLink;
-import tuwien.auto.calimero.server.gateway.KnxServerGateway;
-import tuwien.auto.calimero.server.gateway.SubnetConnector;
+import io.calimero.DataUnitBuilder;
+import io.calimero.DeviceDescriptor;
+import io.calimero.GroupAddress;
+import io.calimero.IndividualAddress;
+import io.calimero.KNXException;
+import io.calimero.KNXTimeoutException;
+import io.calimero.Priority;
+import io.calimero.SerialNumber;
+import io.calimero.device.BaseKnxDevice;
+import io.calimero.device.KnxDevice;
+import io.calimero.device.ios.InterfaceObject;
+import io.calimero.link.KNXNetworkLink;
+import io.calimero.mgmt.ManagementClient;
+import io.calimero.mgmt.ManagementClientImpl;
+import io.calimero.mgmt.PropertyAccess.PID;
+import io.calimero.process.ProcessCommunication;
+import io.calimero.process.ProcessCommunicator;
+import io.calimero.process.ProcessCommunicatorImpl;
+import io.calimero.server.Launcher;
+import io.calimero.server.VirtualLink;
+import io.calimero.server.gateway.KnxServerGateway;
+import io.calimero.server.gateway.SubnetConnector;
 
 /**
  * The test network setup.
@@ -76,6 +84,8 @@ public class TestNetwork implements Runnable
 	private final String configURI;
 
 	/**
+	 * Main entry-point.
+	 *
 	 * @param args server config URI
 	 */
 	public static void main(final String[] args)
@@ -87,6 +97,8 @@ public class TestNetwork implements Runnable
 	}
 
 	/**
+	 * Creates a new instance of the test network.
+	 *
 	 * @param args server config URI
 	 */
 	public TestNetwork(final String[] args)
@@ -97,9 +109,6 @@ public class TestNetwork implements Runnable
 	@Override
 	public void run()
 	{
-		System.getProperties().setProperty("org.slf4j.simpleLogger.logFile", "System.out");
-		System.getProperties().setProperty("org.slf4j.simpleLogger.showLogName", "true");
-
 		final String netif = System.getProperty("calimero.testnetwork.netif");
 		if (netif != null) {
 			// using RandomAccessFile because Files.readAllBytes(path) doesn't resolve 'server-config.xml' to cwd
@@ -121,11 +130,11 @@ public class TestNetwork implements Runnable
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
-			final var ios = launcher.getGateway().getServer().getInterfaceObjectServer();
 			if (gw == null) {
 				System.err.println("Gateway not started - exit");
 				return;
 			}
+			final var ios = gw.getServer().getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
 			final VirtualLink link = (VirtualLink) connectors.get(0).getSubnetLink();
 
@@ -190,7 +199,7 @@ public class TestNetwork implements Runnable
 		final long end = now + timeout * 1_000_000L;
 
 		final var reader = new BufferedReader(new InputStreamReader(System.in));
-		String line = "";
+		String line;
 		do {
 			while (!reader.ready()) {
 				if (System.nanoTime() > end)
@@ -257,7 +266,7 @@ public class TestNetwork implements Runnable
 		final var dev = new BaseKnxDevice("Device-" + address.getDevice(), logic, devLink);
 		final int last = address.getDevice() + 1;
 		final var serialNo = SerialNumber.from(new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last });
-		final byte[] hardwareType = DataUnitBuilder.fromHex("00000000021A");
+		final byte[] hardwareType = HexFormat.of().parseHex("00000000021A");
 		dev.identification(DeviceDescriptor.DD0.TYPE_2705, 0x83, serialNo, hardwareType, new byte[5], new byte[16]);
 		return dev;
 	}
