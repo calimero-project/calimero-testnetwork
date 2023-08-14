@@ -20,3 +20,11 @@ By default, the test-network uses `java.util.logging`, configured via `src/main/
 ### Adapting the network
 
 The test-network can easily be adapted to different testing environments by adjusting the server configuration, the network in `TestNetwork.java`, or modifying the KNX device logic in `TestDeviceLogic.java`.
+
+
+### Start
+Firstly, build gradle:
+> ./gradlew build
+
+And execute command:
+> ./gradlew run

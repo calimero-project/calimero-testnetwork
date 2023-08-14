@@ -155,7 +155,6 @@ public class TestNetwork implements Runnable
 			System.out.println("Test network is up and running");
 
 			boolean state = true;
-			int intState = 13;
 			try (ProcessCommunicator pc = new ProcessCommunicatorImpl(d4.getDeviceLink())) {
 				while (true) {
 					final String s = readStdin(UpdateInterval);
@@ -175,8 +174,7 @@ public class TestNetwork implements Runnable
 							System.out.println(e);
 						}
 						try {
-							intState = ++intState % 101;
-							pc.write(new GroupAddress("1/0/3"), intState, ProcessCommunication.SCALING);
+							pc.write(new GroupAddress("1/0/3"), 6, ProcessCommunication.SCALING);
 							pc.readUnsigned(new GroupAddress("1/0/3"), ProcessCommunication.SCALING);
 						}
 						catch (final KNXException e) {
