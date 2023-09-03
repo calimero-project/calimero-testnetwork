@@ -2,9 +2,9 @@ name: CI with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ feat/loom ]
   pull_request:
-    branches: [ master ]
+    branches: [ feat/loom ]
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        java: [17, 19]
+        java: [21]
     name: Java ${{ matrix.java }} sample
 
     steps:

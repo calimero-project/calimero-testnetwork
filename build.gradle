@@ -18,9 +18,6 @@ run {
     standardInput = System.in
 }
 
-sourceCompatibility = 19
-targetCompatibility = 19
-
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 javadoc.options.encoding = 'UTF-8'
@@ -29,21 +26,21 @@ javadoc.options.encoding = 'UTF-8'
 group = 'io.calimero'
 version = '3.0-SNAPSHOT'
 
-repositories {        
+repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://s01.oss.sonatype.org/content/repositories/snapshots' }
 }
 
-tasks.withType(JavaExec) { jvmArgs += "--enable-preview" }
-
 compileJava.options*.compilerArgs = [
 	'-Xlint:all',
-	'--enable-preview',
 ]
 
 java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
     withSourcesJar()
     withJavadocJar()
 }
@@ -61,8 +58,7 @@ tasks.withType(Jar).configureEach {
 }
 
 tasks.withType(Javadoc) {
-    options.addBooleanOption('-enable-preview', true)
-	options.addStringOption("-release", "${targetCompatibility}")
+	options.addStringOption("-release", "${java.toolchain.getLanguageVersion().get()}")
 }
 
 dependencies {
