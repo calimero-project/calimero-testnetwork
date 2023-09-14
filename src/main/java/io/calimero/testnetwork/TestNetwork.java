@@ -58,6 +58,7 @@ import io.calimero.SerialNumber;
 import io.calimero.device.BaseKnxDevice;
 import io.calimero.device.KnxDevice;
 import io.calimero.device.ios.InterfaceObject;
+import io.calimero.internal.Executor;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.mgmt.ManagementClient;
 import io.calimero.mgmt.ManagementClientImpl;
@@ -126,8 +127,7 @@ public class TestNetwork implements Runnable
 		}
 
 		try (var launcher = new Launcher(configURI)) {
-			final Thread t = new Thread(launcher);
-			t.start();
+			Executor.execute(launcher);
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();
