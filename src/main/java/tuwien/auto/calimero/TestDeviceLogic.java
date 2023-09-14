@@ -145,12 +145,12 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		addDatapoint("1/0/206", DptXlator16BitSet.DptMedia);
 	}
 
-	private void addDatapoint(String address, DPT dpt) throws KNXException {
+	private void addDatapoint(final String address, final DPT dpt) throws KNXException {
 		addDatapoint(address, dpt.getDescription(), dpt);
 	}
 
-	private void addDatapoint(String address, String name, DPT dpt) throws KNXException {
-		StateDP dp = new StateDP(new GroupAddress(address), name, 0, dpt.getID());
+	private void addDatapoint(final String address, final String name, final DPT dpt) throws KNXException {
+		final StateDP dp = new StateDP(new GroupAddress(address), name, 0, dpt.getID());
 		getDatapointModel().add(dp);
 		final String s = TranslatorTypes.createTranslator(0, dp.getDPT()).getValue();
 		state.put(dp.getMainAddress(), s);
@@ -186,8 +186,8 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 1, 3, 0), true);
 
 			if (device.getDeviceLink().getKNXMedium() instanceof RFSettings) {
-				var rfObject = ios.addInterfaceObject(InterfaceObject.RF_MEDIUM_OBJECT);
-				int pidRfMultiType = 51;
+				final var rfObject = ios.addInterfaceObject(InterfaceObject.RF_MEDIUM_OBJECT);
+				final int pidRfMultiType = 51;
 				ios.setProperty(rfObject.getIndex(), pidRfMultiType, 1, 1, (byte) 0);
 			}
 		}
@@ -251,7 +251,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	@Override
-	public ServiceResult<byte[]> readParameter(int objectType, int pid, byte[] info) {
+	public ServiceResult<byte[]> readParameter(final int objectType, final int pid, final byte[] info) {
 		if (objectType != 0 || pid != 59)
 			return super.readParameter(objectType, pid, info);
 
@@ -264,14 +264,14 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		try {
 			Thread.sleep(wait);
 		}
-		catch (InterruptedException e) {
+		catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 		return ServiceResult.of(response);
 	}
 
 	@Override
-	public void writeParameter(int objectType, int pid, byte[] info) {
+	public void writeParameter(final int objectType, final int pid, final byte[] info) {
 		if (LinkProcedure.isEnterConfigMode(objectType, pid, info)) {
 			final ManagementClientImpl mgmt = new ManagementClientImpl(device.getDeviceLink(),
 					((BaseKnxDevice) device).transportLayer()) {};
@@ -311,7 +311,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	@Override
 	public ServiceResult<Duration> restart(final boolean masterReset, final EraseCode eraseCode, final int channel)
 	{
-		var result = super.restart(masterReset, eraseCode, channel);
+		final var result = super.restart(masterReset, eraseCode, channel);
 		if (device.getAddress().equals(new IndividualAddress(1, 1, 4)))
 			setProgrammingMode(true);
 		return result;
@@ -380,7 +380,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final byte[] a1 = new IndividualAddress("1.1.5").toByteArray();
 			final byte[] a2 = new IndividualAddress("1.1.6").toByteArray();
 			final byte[] a3 = new IndividualAddress("1.1.7").toByteArray();
-			int idx = ios.getProperty(knxObject, 1, PID.OBJECT_INDEX, 1, 1)[0];
+			final int idx = ios.getProperty(knxObject, 1, PID.OBJECT_INDEX, 1, 1)[0];
 			ios.setDescription(new Description(idx, knxObject, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 0, 0, true, 0, 10, 3, 3), true);
 			ios.setProperty(knxObject, objectInstance, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 1, 1, a1);
 			ios.setProperty(knxObject, objectInstance, PID.ADDITIONAL_INDIVIDUAL_ADDRESSES, 2, 1, a2);
