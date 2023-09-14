@@ -121,8 +121,7 @@ public class TestNetwork implements Runnable
 		}
 
 		try (var launcher = new Launcher(configURI)) {
-			final Thread t = new Thread(launcher);
-			t.start();
+			Executor.execute(launcher);
 			Thread.sleep(1000);
 
 			final KnxServerGateway gw = launcher.getGateway();

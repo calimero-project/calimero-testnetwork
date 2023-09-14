@@ -281,11 +281,11 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			groupObjects.put(CC_Switch_OnOff, new GroupAddress(7, 3, 10));
 			groupObjects.put(CC_Dimming_Ctrl, new GroupAddress(7, 3, 11));
 
-			Destination respondTo = mgmt.createDestination(new IndividualAddress(1), false);
-			final LinkProcedure lp = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
+			final var respondTo = mgmt.createDestination(new IndividualAddress(1), false);
+			final var linkProc = LinkProcedure.forSensor(mgmt, device.getAddress(), respondTo, false, 0xbeef,
 					groupObjects);
-			lp.setLinkFunction(this::onLinkResponse);
-			new Thread(lp, device.getAddress() + " Link Procedure Thread").start();
+			linkProc.setLinkFunction(this::onLinkResponse);
+			Executor.execute(linkProc, device.getAddress() + " Link Procedure Thread");
 		}
 	}
 
