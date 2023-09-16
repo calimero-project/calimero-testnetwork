@@ -15,7 +15,7 @@ The KNXnet/IP server configuration is provided by the file `src/main/resources/s
 
 ### Logging
 
-By default, the test-network uses `java.util.logging`, configured via `src/main/resources/logging.properties`.
+By default, the test-network uses SLF4J, configured via `src/main/resources/simplelogger.properties`.
 
 ### Adapting the network
 
