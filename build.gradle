@@ -15,9 +15,6 @@ run {
     standardInput = System.in
 }
 
-sourceCompatibility = 17
-targetCompatibility = 17
-
 compileJava.options.encoding = 'UTF-8'
 compileTestJava.options.encoding = 'UTF-8'
 javadoc.options.encoding = 'UTF-8'
@@ -39,6 +36,9 @@ compileJava.options*.compilerArgs = [
 ]
 
 java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(17))
+    }
     withSourcesJar()
     withJavadocJar()
 }
