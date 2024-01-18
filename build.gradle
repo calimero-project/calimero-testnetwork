@@ -23,7 +23,7 @@ javadoc.options.encoding = 'UTF-8'
 group = 'com.github.calimero'
 version = '2.6-SNAPSHOT'
 
-repositories {        
+repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
