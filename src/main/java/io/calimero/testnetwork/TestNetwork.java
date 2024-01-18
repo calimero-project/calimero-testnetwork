@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,6 +55,7 @@ import io.calimero.KNXException;
 import io.calimero.KNXTimeoutException;
 import io.calimero.Priority;
 import io.calimero.SerialNumber;
+import io.calimero.Settings;
 import io.calimero.device.BaseKnxDevice;
 import io.calimero.device.KnxDevice;
 import io.calimero.device.ios.InterfaceObject;
@@ -91,20 +92,38 @@ public class TestNetwork implements Runnable
 	 */
 	public static void main(final String[] args)
 	{
-		if (args.length == 0)
+		if (args.length == 0) {
 			System.err.println("supply calimero-server configuration -- exit");
-		else
-			new TestNetwork(args).run();
+			return;
+		}
+		if ("--version".equals(args[0]) || args.length == 1 && "-v".equals(args[0])) {
+			System.out.println("Calimero testnetwork " + Settings.getLibraryVersion());
+			return;
+		}
+		// we have to set the command-line option for log format and level before first logger lookup
+		System.setProperty("jdk.system.logger.format", "%1$tT.%1$tL [%4$-7s] %3$s: %5$s%6$s%n");
+		int optIdx = 0;
+		if (args[0].startsWith("-v")) {
+			final String vs = args[0];
+			final String level = vs.startsWith("-vvv") ? "TRACE" : vs.startsWith("-vv") ? "DEBUG" : "INFO";
+			System.setProperty("jdk.system.logger.level", level);
+			System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", level);
+			optIdx++;
+		}
+
+		final String configUri = args[args.length - 1];
+		final boolean detached = "--no-stdin".equals(args[optIdx]);
+		new TestNetwork(configUri).run();
 	}
 
 	/**
 	 * Creates a new instance of the test network.
 	 *
-	 * @param args server config URI
+	 * @param configUri server config URI
 	 */
-	public TestNetwork(final String[] args)
+	public TestNetwork(final String configUri)
 	{
-		configURI = args[0];
+		configURI = configUri;
 	}
 
 	@Override
