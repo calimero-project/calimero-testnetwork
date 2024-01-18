@@ -1,6 +1,6 @@
 /*
     Calimero 2 - A library for KNX network access
-    Copyright (c) 2010, 2023 B. Malinowsky
+    Copyright (c) 2010, 2024 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -409,16 +409,16 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		//
 		// set properties used in manufacturer data DIB for discovery self-description
 		//
-		final byte[] zero = new byte[1];
+
 		// we don't indicate any capabilities here, since executing the respective tasks
 		// is either done in the gateway (and, therefore, the property is set by the
 		// gateway) or by the user, who has to care about it on its own
-		ios.setProperty(knxObject, objectInstance, PID.KNXNETIP_ROUTING_CAPABILITIES, 1, 1, zero);
-		ios.setProperty(knxObject, objectInstance, PID.KNXNETIP_DEVICE_STATE, 1, 1, zero);
+		ios.setProperty(knxObject, objectInstance, PID.KNXNETIP_ROUTING_CAPABILITIES, 1, 1, (byte) 0);
+		ios.setProperty(knxObject, objectInstance, PID.KNXNETIP_DEVICE_STATE, 1, 1, (byte) 0);
 
-		ios.setProperty(knxObject, objectInstance, PID.IP_CAPABILITIES, 1, 1, zero);
-		ios.setProperty(knxObject, objectInstance, PID.IP_ASSIGNMENT_METHOD, 1, 1, new byte[] { 1 });
-		ios.setProperty(knxObject, objectInstance, PID.CURRENT_IP_ASSIGNMENT_METHOD, 1, 1, new byte[] { 1 });
+		ios.setProperty(knxObject, objectInstance, PID.IP_CAPABILITIES, 1, 1, (byte) 0);
+		ios.setProperty(knxObject, objectInstance, PID.IP_ASSIGNMENT_METHOD, 1, 1, (byte) 1);
+		ios.setProperty(knxObject, objectInstance, PID.CURRENT_IP_ASSIGNMENT_METHOD, 1, 1, (byte) 1);
 	}
 
 	private static void resetRoutingConfiguration(final InterfaceObjectServer ios)
