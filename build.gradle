@@ -8,7 +8,7 @@ plugins {
 }
 
 application {
-    mainModule = 'io.calimero.testnetwork' 
+    mainModule = 'io.calimero.testnetwork'
     mainClass = 'io.calimero.testnetwork.TestNetwork'
 }
 
@@ -26,7 +26,7 @@ javadoc.options.encoding = 'UTF-8'
 group = 'io.calimero'
 version = '3.0-SNAPSHOT'
 
-repositories {        
+repositories {
     mavenLocal()
     mavenCentral()
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -62,7 +62,7 @@ dependencies {
     implementation group:group, name: 'calimero-server', version:version
     implementation group:group, name: 'calimero-core', version:version
     implementation group:group, name: 'calimero-device', version:version
-    
+
     runtimeOnly 'org.slf4j:slf4j-jdk-platform-logging:2.0.9'
     runtimeOnly 'org.slf4j:slf4j-simple:2.0.9'
 }
