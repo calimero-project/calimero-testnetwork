@@ -43,6 +43,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.util.HexFormat;
 import java.util.List;
@@ -77,30 +79,50 @@ public class TestNetwork implements Runnable
 	private final String configURI;
 
 	/**
-	 * Main entry-point.
+	 * Main entry-point for running TestNetwork.<p>
+	 * Syntax: <code>TestNetwork [options] [server config URI]</code><br>
+	 * If no server configuration URI is supplied, the current working directory is checked for a file named <i>server-config.xml</i>.
 	 *
-	 * @param args server config URI
+	 * @param args command line options for running TestNetwork:
+	 * <ul>
+	 *   <li><code>--version</code> print version and exit</li>
+	 *   <li><code>-v, -vv, -vvv:</code> set log verbosity (info, debug, or trace), overrides configured log level</li>
+	 *   <li><code>--no-stdin</code> ignored</li>
+	 * </ul>
 	 */
 	public static void main(final String[] args)
 	{
-		if (args.length == 0) {
-			System.err.println("supply calimero-server configuration -- exit");
-			return;
-		}
-		if ("--version".equals(args[0]) || args.length == 1 && "-v".equals(args[0])) {
+		if (args.length > 0 && "--version".equals(args[0])) {
 			System.out.println("Calimero testnetwork " + Settings.getLibraryVersion());
 			return;
 		}
 		int optIdx = 0;
-		if (args[0].startsWith("-v")) {
+		if (args.length > 0 && args[0].startsWith("-v")) {
 			final String vs = args[0];
 			final String level = vs.startsWith("-vvv") ? "TRACE" : vs.startsWith("-vv") ? "DEBUG" : "INFO";
 			System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", level);
 			optIdx++;
 		}
 
-		final String configUri = args[args.length - 1];
-		final boolean detached = "--no-stdin".equals(args[optIdx]);
+		final String configUri;
+		if (args.length > optIdx) {
+			final boolean detached = "--no-stdin".equals(args[optIdx]);
+			if (detached)
+				optIdx++;
+		}
+
+		if (args.length > optIdx)
+			configUri = args[args.length - 1];
+		else {
+			// check cwd for default config
+			var defConfig = Path.of("server-config.xml").toAbsolutePath();
+			if (!Files.exists(defConfig)) {
+				System.err.format("no default server configuration found at %s -- exit", defConfig);
+				return;
+			}
+			configUri = defConfig.toString();
+		}
+
 		new TestNetwork(configUri).run();
 	}
 
