@@ -151,7 +151,7 @@ public class TestNetwork implements Runnable
 	@Override
 	public void run()
 	{
-		final String netif = System.getProperty("calimero.testnetwork.netif");
+		final String netif = System.getProperty("io.calimero.testnetwork.netif");
 		if (netif != null) {
 			// using RandomAccessFile because Files.readAllBytes(path) doesn't resolve 'server-config.xml' to cwd
 			try (RandomAccessFile file = new RandomAccessFile(configURI, "r")) {
