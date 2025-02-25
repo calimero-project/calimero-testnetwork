@@ -65,6 +65,14 @@ tasks.withType<Jar>().configureEach {
 	}
 }
 
+tasks.distTar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+tasks.distZip {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 dependencies {
 	implementation("$group:calimero-server:$version")
 	implementation("$group:calimero-core:$version")
