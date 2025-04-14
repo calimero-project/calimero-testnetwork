@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ import io.calimero.IndividualAddress;
 import io.calimero.KNXAddress;
 import io.calimero.KNXException;
 import io.calimero.KNXFormatException;
+import io.calimero.ReturnCode;
 import io.calimero.datapoint.Datapoint;
 import io.calimero.datapoint.DatapointMap;
 import io.calimero.datapoint.StateDP;
@@ -78,6 +79,7 @@ import io.calimero.dptxlator.DPTXlator8BitUnsigned;
 import io.calimero.dptxlator.DPTXlatorBoolean;
 import io.calimero.dptxlator.DPTXlatorString;
 import io.calimero.dptxlator.DptXlator16BitSet;
+import io.calimero.dptxlator.PropertyTypes;
 import io.calimero.dptxlator.TranslatorTypes;
 import io.calimero.internal.Executor;
 import io.calimero.knxnetip.KNXnetIPRouting;
@@ -123,6 +125,8 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	// server friendly name, matches PID.FRIENDLY_NAME property
 	private static final String friendlyName = "KNX Test Device";
+
+	private static final int pidOperationMode = 52;
 
 	private final Map<GroupAddress, String> state = new HashMap<>();
 	private final List<Datapoint> isResponder = new ArrayList<>();
@@ -176,9 +180,9 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		if (device.getAddress().equals(TestNetwork.responderDevice))
 			isResponder.addAll(((DatapointMap<Datapoint>) getDatapointModel()).getDatapoints());
 
+		final InterfaceObjectServer ios = device.getInterfaceObjectServer();
 		// the rest here just sets some arbitrary values in interface objects required for testing
 		try {
-			final InterfaceObjectServer ios = device.getInterfaceObjectServer();
 			// set TP1 medium type
 			ios.setDescription(new Description(0, 0, PID.MEDIUM_TYPE, 0, 0, false, 0, 1, 3, 0), true);
 			ios.setProperty(0, PID.MEDIUM_TYPE, 1, 1, new byte[] { 0x1 });
@@ -202,7 +206,6 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			e.printStackTrace();
 		}
 
-		final InterfaceObjectServer ios = device.getInterfaceObjectServer();
 		ios.addInterfaceObject(InterfaceObject.KNXNETIP_PARAMETER_OBJECT);
 
 		// create interface object list for property PID_IO_LIST
@@ -232,6 +235,11 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 		catch (final KnxPropertyException e) {
 			e.printStackTrace();
 		}
+
+		final var appProg = ios.lookup(InterfaceObject.APPLICATIONPROGRAM_OBJECT, 1);
+		ios.setDescription(new Description(appProg.getIndex(), 0, pidOperationMode, 0,
+				PropertyTypes.PDT_FUNCTION, true, 1, 1, 3, 3), true);
+		ios.setProperty(InterfaceObject.APPLICATIONPROGRAM_OBJECT, 1, pidOperationMode, 1, 1, (byte) 0);
 
 		try {
 			initKNXnetIpParameterObject(ios, 1);
@@ -326,6 +334,47 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 
 	private static final int NetworkParameterRes = 0b1111011011;
 	private static final int SystemNetworkParamResponse = 0b0111001001;
+
+	@Override
+	public ServiceResult<byte[]> functionPropertyCommand(final Destination remote, final int objectIndex,
+			final int propertyId, final byte[] command) {
+		final var ios = device.getInterfaceObjectServer();
+		final int objectType = ios.getInterfaceObjects()[objectIndex].getType();
+
+		if (objectType == InterfaceObject.APPLICATIONPROGRAM_OBJECT && propertyId == pidOperationMode) {
+			if (command.length > 2) {
+				final int reserved = command[0] & 0xff;
+				final int serviceId = command[1] & 0xff;
+				if (reserved != 0 || serviceId != 0)
+					return ServiceResult.of(ReturnCode.of(0xA0), (byte) serviceId, (byte) 0, (byte) 0xff);
+				if (command.length == 3) {
+					final int opMode = command[2] & 0xff;
+					if (opMode > 1)
+						return ServiceResult.of(ReturnCode.of(0xA0), (byte) serviceId, (byte) 0, (byte) 0xff);
+					return new ServiceResult<>((byte) 0x20, (byte) serviceId, (byte) 0, (byte) 0xff);
+				}
+			}
+		}
+		return super.functionPropertyCommand(remote, objectIndex, propertyId, command);
+	}
+
+	@Override
+	public ServiceResult<byte[]> readFunctionPropertyState(final Destination remote, final int objectIndex,
+			final int propertyId, final byte[] functionInput) {
+		final var ios = device.getInterfaceObjectServer();
+		final int objectType = ios.getInterfaceObjects()[objectIndex].getType();
+
+		if (objectType == InterfaceObject.APPLICATIONPROGRAM_OBJECT && propertyId == pidOperationMode) {
+			if (functionInput.length > 1) {
+				final int reserved = functionInput[0] & 0xff;
+				final int serviceId = functionInput[1] & 0xff;
+				if (reserved != 0 || serviceId != 0)
+					return ServiceResult.of(ReturnCode.of(0xA0), (byte) serviceId, (byte) 0, (byte) 0xff);
+				return ServiceResult.of(ReturnCode.of(0x20), (byte) serviceId, (byte) 0, (byte) 0xff);
+			}
+		}
+		return super.readFunctionPropertyState(remote, objectIndex, propertyId, functionInput);
+	}
 
 	@Override
 	public ServiceResult<byte[]> management(final int svcType, final byte[] asdu, final KNXAddress dst,
