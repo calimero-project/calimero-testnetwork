@@ -1,6 +1,6 @@
 /*
     Calimero 3 - A library for KNX network access
-    Copyright (c) 2010, 2024 B. Malinowsky
+    Copyright (c) 2010, 2025 B. Malinowsky
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ public class TestNetwork implements Runnable
 			try (RandomAccessFile file = new RandomAccessFile(configURI, "r")) {
 				final byte[] buf = new byte[(int) file.length()];
 				file.readFully(buf);
-				final String s = new String(buf, UTF_8).replace("listenNetIf=\"any\"", "listenNetIf=\"" + netif + "\"");
+				final String s = new String(buf, UTF_8).replace("netif=\"any\"", "netif=\"" + netif + "\"");
 				try (FileOutputStream fos = new FileOutputStream(configURI, false)) {
 					fos.write(s.getBytes(UTF_8));
 				}
