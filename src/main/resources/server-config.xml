@@ -2,7 +2,7 @@
 <!-- Calimero KNXnet/IP server settings -->
 <knxServer name="test-network" friendlyName="Calimero test network">
 	<discovery listenNetIf="all" outgoingNetIf="all" />
-	<serviceContainer activate="true" routing="true" networkMonitoring="true" listenNetIf="any" udpPort="3671" securedServices="optional">
+	<serviceContainer activate="true" routing="true" networkMonitoring="true" netif="any" udpPort="3671" securedServices="optional">
 		<knxAddress type="individual">1.1.0</knxAddress>
 		<knxSubnet type="virtual" medium="pl110" domainAddress="6c">TestNetwork</knxSubnet>
 		<groupAddressFilter>
