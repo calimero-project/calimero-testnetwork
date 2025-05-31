@@ -77,7 +77,7 @@ dependencies {
 	implementation("$group:calimero-server:$version")
 	implementation("$group:calimero-core:$version")
 	implementation("$group:calimero-device:$version")
-	runtimeOnly("org.slf4j:slf4j-simple:2.0.16")
+	runtimeOnly("org.slf4j:slf4j-simple:2.0.17")
 }
 
 publishing {
