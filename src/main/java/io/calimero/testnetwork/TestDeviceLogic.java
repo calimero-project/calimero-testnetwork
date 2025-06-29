@@ -66,6 +66,7 @@ import io.calimero.device.KnxDevice;
 import io.calimero.device.KnxDeviceServiceLogic;
 import io.calimero.device.LinkProcedure;
 import io.calimero.device.ServiceResult;
+import io.calimero.device.ios.DeviceObject;
 import io.calimero.device.ios.InterfaceObject;
 import io.calimero.device.ios.InterfaceObjectServer;
 import io.calimero.device.ios.KnxPropertyException;
@@ -195,6 +196,16 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 			final byte[] serialNo = new byte[] { 0x1, 0x2, 0x3, 0x4, 0x5, (byte) last };
 			ios.setProperty(0, PID.SERIAL_NUMBER, 1, 1, serialNo);
 			ios.setDescription(new Description(0, 0, PID.SERIAL_NUMBER, 0, 0, false, 0, 1, 3, 0), true);
+
+			if (device.getAddress().equals(TestNetwork.programmableDevice)) {
+				final int pidFeaturesSupported = 89;
+				final var featureBits = new byte[10];
+				// don't indicate extended memory services (bit 3), so core lib can test normal mem r/w
+				featureBits[9] = (1 << 1) | (1 << 2) | (0 << 3) | (1 << 4) | (1 << 6);
+				featureBits[8] = (1 << 0) | (1 << 2) | (1 << 3) | (1 << 4) | (1 << 6);
+				final var deviceObject = DeviceObject.lookup(ios);
+				deviceObject.set(pidFeaturesSupported, featureBits);
+			}
 
 			if (device.getDeviceLink().getKNXMedium() instanceof RFSettings) {
 				final var rfObject = ios.addInterfaceObject(InterfaceObject.RF_MEDIUM_OBJECT);
