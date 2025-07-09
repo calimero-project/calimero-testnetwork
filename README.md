@@ -1,4 +1,4 @@
-Calimero test-network [![CI with Gradle](https://github.com/calimero-project/calimero-testnetwork/actions/workflows/gradle.yml/badge.svg)](https://github.com/calimero-project/calimero-testnetwork/actions/workflows/gradle.yml)
+Calimero test-network [![CI with Gradle](https://github.com/calimero-project/calimero-testnetwork/actions/workflows/gradle.yml/badge.svg)](https://github.com/calimero-project/calimero-testnetwork/actions/workflows/gradle.yml) [![](https://jitpack.io/v/calimero-project/calimero-testnetwork.svg)](https://jitpack.io/#calimero-project/calimero-testnetwork) [![](https://img.shields.io/badge/jitpack-master-brightgreen?label=JitPack)](https://jitpack.io/#calimero-project/calimero-testnetwork/master)
 =====================
 
 A generic and adaptable KNX test-network for automatic unit-testing, as well as client-side development. The test network enables a developer to test client-side software behavior, without the requirement of having a physical test-setup (i.e., hardware).
