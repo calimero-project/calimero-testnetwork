@@ -35,8 +35,7 @@ version = "3.0-SNAPSHOT"
 repositories {
 	mavenLocal()
 	mavenCentral()
-	maven("https://oss.sonatype.org/content/repositories/snapshots")
-	maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+	maven("https://central.sonatype.com/repository/maven-snapshots/")
 }
 
 tasks.compileJava {
