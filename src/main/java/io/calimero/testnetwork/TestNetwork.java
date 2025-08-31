@@ -178,7 +178,7 @@ public class TestNetwork implements Runnable
 			}
 			final var ios = gw.getServer().getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
-			final VirtualLink link = (VirtualLink) connectors.get(0).getSubnetLink();
+			final VirtualLink link = (VirtualLink) connectors.getFirst().getSubnetLink();
 
 			final KnxDevice d4 = createDevice(programmableDevice, link);
 			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
@@ -289,7 +289,7 @@ public class TestNetwork implements Runnable
 			}
 			catch (final KNXTimeoutException ignore) {}
 			try {
-				mgmt.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, (byte) 0);
+				mgmt.readSystemNetworkParameter(0, PID.SERIAL_NUMBER, 0);
 			}
 			catch (final KNXTimeoutException ignore) {}
 		}
