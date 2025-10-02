@@ -62,6 +62,7 @@ import io.calimero.device.BaseKnxDevice;
 import io.calimero.device.KnxDevice;
 import io.calimero.device.ios.InterfaceObject;
 import io.calimero.internal.Executor;
+import io.calimero.link.Connector;
 import io.calimero.link.KNXNetworkLink;
 import io.calimero.mgmt.ManagementClient;
 import io.calimero.mgmt.ManagementClientImpl;
@@ -178,7 +179,7 @@ public class TestNetwork implements Runnable
 			}
 			final var ios = gw.getServer().getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
-			final VirtualLink link = (VirtualLink) connectors.getFirst().getSubnetLink();
+			final VirtualLink link = (VirtualLink) ((Connector.Link) connectors.getFirst().getSubnetLink()).target();
 
 			final KnxDevice d4 = createDevice(programmableDevice, link);
 			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
