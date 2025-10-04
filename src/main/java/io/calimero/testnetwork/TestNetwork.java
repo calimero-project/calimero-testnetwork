@@ -60,6 +60,7 @@ import io.calimero.SerialNumber;
 import io.calimero.Settings;
 import io.calimero.device.BaseKnxDevice;
 import io.calimero.device.KnxDevice;
+import io.calimero.device.ios.DeviceObject;
 import io.calimero.device.ios.InterfaceObject;
 import io.calimero.internal.Executor;
 import io.calimero.link.Connector;
@@ -183,6 +184,12 @@ public class TestNetwork implements Runnable
 
 			final KnxDevice d4 = createDevice(programmableDevice, link);
 			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
+
+			// our subnet link has a max apdu of 15, which is reflected in the device object after the Connector.Link
+			// fires a connection-status changed event upon connecting
+			// for testing purposes, we need the server device with a max apdu of 254
+			DeviceObject.lookup(ios).set(PID.MAX_APDULENGTH, (byte) 0,
+					(byte) gw.getServer().device().getDeviceLink().getKNXMedium().maxApduLength());
 
 			routerObjectIndex = ios.lookup(InterfaceObject.ROUTER_OBJECT, 1).getIndex();
 
