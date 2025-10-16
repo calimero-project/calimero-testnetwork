@@ -180,7 +180,8 @@ public class TestNetwork implements Runnable
 			}
 			final var ios = gw.getServer().getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
-			final VirtualLink link = (VirtualLink) ((Connector.Link) connectors.getFirst().getSubnetLink()).target();
+			@SuppressWarnings("unchecked")
+			final VirtualLink link = ((Connector.Link<VirtualLink>) connectors.getFirst().getSubnetLink()).target();
 
 			final KnxDevice d4 = createDevice(programmableDevice, link);
 			/*final KnxDevice d5 =*/ createDevice(responderDevice, link);
