@@ -245,19 +245,20 @@ public class TestNetwork implements Runnable
 		}
 	}
 
+	private static final BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+
 	private static String readStdin(final int timeout) throws InterruptedException, IOException {
 		final long now = System.nanoTime();
 		final long end = now + timeout * 1_000_000L;
 
-		final var reader = new BufferedReader(new InputStreamReader(System.in));
 		String line;
 		do {
-			while (!reader.ready()) {
+			while (!stdin.ready()) {
 				if (System.nanoTime() > end)
 					return "";
 				Thread.sleep(200);
 			}
-			line = reader.readLine();
+			line = stdin.readLine();
 		}
 		while ("".equals(line));
 		return line;
