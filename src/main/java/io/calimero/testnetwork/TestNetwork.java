@@ -73,8 +73,8 @@ import io.calimero.process.ProcessCommunicator;
 import io.calimero.process.ProcessCommunicatorImpl;
 import io.calimero.server.Launcher;
 import io.calimero.server.VirtualLink;
-import io.calimero.server.gateway.KnxServerGateway;
 import io.calimero.server.gateway.SubnetConnector;
+import io.calimero.server.knxnetip.KNXnetIPServer;
 
 /**
  * The test network setup.
@@ -171,14 +171,15 @@ public class TestNetwork implements Runnable
 
 		try (var launcher = new Launcher(configURI)) {
 			Executor.execute(launcher);
-			Thread.sleep(1000);
-
-			final KnxServerGateway gw = launcher.getGateway();
-			if (gw == null) {
+			final var gw = launcher.getGateway();
+			final var server = gw.getServer();
+			while (server.state() == KNXnetIPServer.State.New || server.state() == KNXnetIPServer.State.Starting)
+				Thread.sleep(50);
+			if (server.state() != KNXnetIPServer.State.Running) {
 				System.err.println("Gateway not started - exit");
 				return;
 			}
-			final var ios = gw.getServer().getInterfaceObjectServer();
+			final var ios = server.getInterfaceObjectServer();
 			final List<SubnetConnector> connectors = gw.getSubnetConnectors();
 			@SuppressWarnings("unchecked")
 			final VirtualLink link = ((Connector.Link<VirtualLink>) connectors.getFirst().getSubnetLink()).target();
@@ -190,7 +191,7 @@ public class TestNetwork implements Runnable
 			// fires a connection-status changed event upon connecting
 			// for testing purposes, we need the server device with a max apdu of 254
 			DeviceObject.lookup(ios).set(PID.MAX_APDULENGTH, (byte) 0,
-					(byte) gw.getServer().device().getDeviceLink().getKNXMedium().maxApduLength());
+					(byte) server.device().getDeviceLink().getKNXMedium().maxApduLength());
 
 			routerObjectIndex = ios.lookup(InterfaceObject.ROUTER_OBJECT, 1).getIndex();
 
