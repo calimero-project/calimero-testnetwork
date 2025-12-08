@@ -129,7 +129,7 @@ class TestDeviceLogic extends KnxDeviceServiceLogic
 	}
 
 	private void addDatapoint(final String address, final String name, final DPT dpt) throws KNXException {
-		final StateDP dp = new StateDP(new GroupAddress(address), name, 0, dpt.getID());
+		final StateDP dp = new StateDP(new GroupAddress(address), name, dpt.dptId());
 		getDatapointModel().add(dp);
 		final String s = TranslatorTypes.createTranslator(dp.dptId()).getValue();
 		state.put(dp.getMainAddress(), s);
