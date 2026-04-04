@@ -30,7 +30,7 @@ tasks.javadoc {
 }
 
 group = "io.calimero"
-version = "3.0-SNAPSHOT"
+version = "3.0-M2"
 
 repositories {
 	mavenLocal()
